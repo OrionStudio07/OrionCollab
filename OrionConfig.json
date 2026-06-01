@@ -1,0 +1,31 @@
+{
+  "$schema": "OrionConfig/v1",
+  "client": {
+    "company_name": "Morde Foods",
+    "plant_name": "P2 Manufacturing Plant",
+    "logo_path": "Content/CollaborativeViewer/UMG/Textures/Logo.png",
+    "accent_color": "#00D4AA"
+  },
+  "modes": {
+    "showcase": true,
+    "training": false,
+    "operations": true
+  },
+  "features": {
+    "minimap": true,
+    "guided_tour": true,
+    "npc_workers": true,
+    "session_recording": false,
+    "simulation_data": false
+  },
+  "optimization": {
+    "lumen_enabled": true,
+    "vr_mode": "pc_tethered",
+    "target_fps_desktop": 60,
+    "target_fps_vr": 72
+  },
+  "save_game": {
+    "save_file_prefix": "Orion",
+    "auto_save_interval_seconds": 300
+  }
+}

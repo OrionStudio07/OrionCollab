@@ -1,0 +1,3 @@
+---,RoomID,BuildingID,DisplayName,Floor,Function,SafetyZoneType,SafetyZoneColor
+Row_001,Room_101,Building_A,"Hall 101",1,"Mixing and Processing",General,"(R=0.500,G=0.500,B=0.500,A=0.300)"
+Row_002,Room_101,Building_B,"Hall 101",1,"Mixing and Processing",General,"(R=0.500,G=0.500,B=0.500,A=0.300)"

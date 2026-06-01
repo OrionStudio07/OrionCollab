@@ -1,0 +1,280 @@
+{
+  "version": 3,
+  "skills": {
+    "grill-me": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/mattpocock/skills.git",
+      "skillPath": "skills/productivity/grill-me/SKILL.md",
+      "skillFolderHash": "2a1ad17028306ebe45f0e49703fa28b9b2e7f499",
+      "pluginName": "mattpocock-skills",
+      "installedAt": "2026-05-29T16:43:08.239Z",
+      "updatedAt": "2026-05-29T16:43:08.239Z"
+    },
+    "handoff": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/mattpocock/skills.git",
+      "skillPath": "skills/productivity/handoff/SKILL.md",
+      "skillFolderHash": "7bbb60d64c911617cee7f71b2ba9e24364faa14e",
+      "pluginName": "mattpocock-skills",
+      "installedAt": "2026-05-29T16:43:08.266Z",
+      "updatedAt": "2026-05-29T16:43:08.266Z"
+    },
+    "write-a-skill": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/mattpocock/skills.git",
+      "skillPath": "skills/productivity/write-a-skill/SKILL.md",
+      "skillFolderHash": "2f252b35aa238879afc5a230ac30343708dee0b3",
+      "pluginName": "mattpocock-skills",
+      "installedAt": "2026-05-29T16:43:08.276Z",
+      "updatedAt": "2026-05-29T16:43:08.276Z"
+    },
+    "brainstorming": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/brainstorming/SKILL.md",
+      "skillFolderHash": "f260c775073816860fef8a37c032ac77e2ff5821",
+      "installedAt": "2026-05-29T16:50:19.378Z",
+      "updatedAt": "2026-05-29T16:50:19.378Z"
+    },
+    "dispatching-parallel-agents": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/dispatching-parallel-agents/SKILL.md",
+      "skillFolderHash": "ebd0490e6b0bccfdb9f9c0cc9dd6a066036c8d89",
+      "installedAt": "2026-05-29T16:50:19.396Z",
+      "updatedAt": "2026-05-29T16:50:19.396Z"
+    },
+    "executing-plans": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/executing-plans/SKILL.md",
+      "skillFolderHash": "7c20d2bd7ff7b166ea3064e21b1e5f0455750878",
+      "installedAt": "2026-05-29T16:50:19.417Z",
+      "updatedAt": "2026-05-29T16:50:19.417Z"
+    },
+    "finishing-a-development-branch": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/finishing-a-development-branch/SKILL.md",
+      "skillFolderHash": "782e09faa5dcf7e9a7a173bd14b5622e35b80169",
+      "installedAt": "2026-05-29T16:50:19.439Z",
+      "updatedAt": "2026-05-29T16:50:19.439Z"
+    },
+    "receiving-code-review": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/receiving-code-review/SKILL.md",
+      "skillFolderHash": "7750c56fddb8b2f1cbdb1550a6e3e40d2eeac5f1",
+      "installedAt": "2026-05-29T16:50:19.460Z",
+      "updatedAt": "2026-05-29T16:50:19.460Z"
+    },
+    "requesting-code-review": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/requesting-code-review/SKILL.md",
+      "skillFolderHash": "ff419ec159bdf5ff2f2d83c7e544c586bcde69bb",
+      "installedAt": "2026-05-29T16:50:19.491Z",
+      "updatedAt": "2026-05-29T16:50:19.491Z"
+    },
+    "subagent-driven-development": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/subagent-driven-development/SKILL.md",
+      "skillFolderHash": "73b43347c1bdc10f6ab81a5cdb036dd1c8098cc0",
+      "installedAt": "2026-05-29T16:50:19.524Z",
+      "updatedAt": "2026-05-29T16:50:19.524Z"
+    },
+    "systematic-debugging": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/systematic-debugging/SKILL.md",
+      "skillFolderHash": "e96f5f2620c17069d668be1880d5492e34c84ceb",
+      "installedAt": "2026-05-29T16:50:19.554Z",
+      "updatedAt": "2026-05-29T16:50:19.554Z"
+    },
+    "test-driven-development": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/test-driven-development/SKILL.md",
+      "skillFolderHash": "98904a7d8e0e04b9bd46220b9b17298f45fe0b72",
+      "installedAt": "2026-05-29T16:50:19.566Z",
+      "updatedAt": "2026-05-29T16:50:19.566Z"
+    },
+    "using-git-worktrees": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/using-git-worktrees/SKILL.md",
+      "skillFolderHash": "13a9643fb9e4b236173f7d4b56b15dac10394f1b",
+      "installedAt": "2026-05-29T16:50:19.590Z",
+      "updatedAt": "2026-05-29T16:50:19.590Z"
+    },
+    "using-superpowers": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/using-superpowers/SKILL.md",
+      "skillFolderHash": "225dd70596c396940ff158335a954a64d93ece40",
+      "installedAt": "2026-05-29T16:50:19.612Z",
+      "updatedAt": "2026-05-29T16:50:19.612Z"
+    },
+    "verification-before-completion": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/verification-before-completion/SKILL.md",
+      "skillFolderHash": "ceb2f1f67f4cadb29b32a06e54d3d0be832071f5",
+      "installedAt": "2026-05-29T16:50:19.634Z",
+      "updatedAt": "2026-05-29T16:50:19.634Z"
+    },
+    "writing-plans": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/writing-plans/SKILL.md",
+      "skillFolderHash": "8fe8e8b6ee9e5cbe53cb172a36f0dc31f9875847",
+      "installedAt": "2026-05-29T16:50:19.656Z",
+      "updatedAt": "2026-05-29T16:50:19.656Z"
+    },
+    "writing-skills": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/writing-skills/SKILL.md",
+      "skillFolderHash": "80e8c7d3be99d55d5d76c9516cc45a1e7f48f281",
+      "installedAt": "2026-05-29T16:50:19.680Z",
+      "updatedAt": "2026-05-29T16:50:19.680Z"
+    },
+    "ckm:banner-design": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git",
+      "skillPath": ".claude/skills/banner-design/SKILL.md",
+      "skillFolderHash": "a25378410a0d9c3715520e6a78b272a90519ded0",
+      "installedAt": "2026-05-29T16:50:56.171Z",
+      "updatedAt": "2026-05-29T16:50:56.171Z"
+    },
+    "ckm:brand": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git",
+      "skillPath": ".claude/skills/brand/SKILL.md",
+      "skillFolderHash": "338e727758db86ca101d70306f4d0a4ba19ee1f5",
+      "installedAt": "2026-05-29T16:50:56.197Z",
+      "updatedAt": "2026-05-29T16:50:56.197Z"
+    },
+    "ckm:design": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git",
+      "skillPath": ".claude/skills/design/SKILL.md",
+      "skillFolderHash": "1a9322b8659631ff80fe6f3926f7218485ede972",
+      "installedAt": "2026-05-29T16:50:56.235Z",
+      "updatedAt": "2026-05-29T16:50:56.235Z"
+    },
+    "ckm:design-system": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git",
+      "skillPath": ".claude/skills/design-system/SKILL.md",
+      "skillFolderHash": "4e9756119ec08dc28bf772d8b348d68866e43571",
+      "installedAt": "2026-05-29T16:50:56.268Z",
+      "updatedAt": "2026-05-29T16:50:56.268Z"
+    },
+    "ckm:slides": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git",
+      "skillPath": ".claude/skills/slides/SKILL.md",
+      "skillFolderHash": "6d66fdefcf7d445dd78d788c6810d6302356343c",
+      "installedAt": "2026-05-29T16:50:56.293Z",
+      "updatedAt": "2026-05-29T16:50:56.293Z"
+    },
+    "ckm:ui-styling": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git",
+      "skillPath": ".claude/skills/ui-styling/SKILL.md",
+      "skillFolderHash": "362c326af27fdac47a54a1ae94da5bd474bf9157",
+      "installedAt": "2026-05-29T16:50:56.315Z",
+      "updatedAt": "2026-05-29T16:50:56.315Z"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git",
+      "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "skillFolderHash": "75e1acaafe8b08e59d4b86fc253ac7873aff6bba",
+      "pluginName": "ui-ux-pro-max",
+      "installedAt": "2026-05-29T16:50:56.337Z",
+      "updatedAt": "2026-05-29T16:50:56.337Z"
+    },
+    "unreal-engine-cpp-pro": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/sickn33/antigravity-awesome-skills.git",
+      "skillPath": "skills/unreal-engine-cpp-pro/SKILL.md",
+      "skillFolderHash": "263d765ecdfb6bc57d37930ae98e9d48dc1cd03b",
+      "installedAt": "2026-05-31T13:05:38.354Z",
+      "updatedAt": "2026-05-31T13:05:38.354Z"
+    },
+    "cpp-coding-standards": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/affaan-m/everything-claude-code.git",
+      "skillPath": "skills/cpp-coding-standards/SKILL.md",
+      "skillFolderHash": "84ccb47f24540e81c1fc424f570d92fb7383e3f9",
+      "installedAt": "2026-05-31T13:05:52.755Z",
+      "updatedAt": "2026-05-31T13:05:52.755Z"
+    },
+    "game-performance-profiler": {
+      "source": "akillness/oh-my-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/akillness/oh-my-skills.git",
+      "skillPath": ".agent-skills/game-performance-profiler/SKILL.md",
+      "skillFolderHash": "5c381d684368a28f8f432a84aeeb47570ce7128f",
+      "installedAt": "2026-05-31T13:05:57.406Z",
+      "updatedAt": "2026-05-31T13:05:57.406Z"
+    },
+    "cpp-testing": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/affaan-m/everything-claude-code.git",
+      "skillPath": "skills/cpp-testing/SKILL.md",
+      "skillFolderHash": "79a134d3e2e701b58725335871b26b65c7a720eb",
+      "installedAt": "2026-05-31T13:06:04.707Z",
+      "updatedAt": "2026-05-31T13:06:04.707Z"
+    },
+    "Autodesk": {
+      "source": "sfkislev/flue",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/sfkislev/flue.git",
+      "skillPath": "skills/autodesk/SKILL.md",
+      "skillFolderHash": "387af5718e9a423fba29e49a84a757ef527b0faa",
+      "installedAt": "2026-05-31T13:06:11.160Z",
+      "updatedAt": "2026-05-31T13:06:11.160Z"
+    },
+    "3d-modeling": {
+      "source": "omer-metin/skills-for-antigravity",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/omer-metin/skills-for-antigravity.git",
+      "skillPath": "skills/3d-modeling/SKILL.md",
+      "skillFolderHash": "2773e083395d6f8d510dd1c95f3f5d1e40775cdd",
+      "installedAt": "2026-05-31T13:06:15.943Z",
+      "updatedAt": "2026-05-31T13:06:15.943Z"
+    }
+  },
+  "dismissed": {}
+}

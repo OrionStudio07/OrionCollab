@@ -1,0 +1,3 @@
+---,BuildingID,DisplayName,Floors,LocationOrigin,LocationExtent
+Row_001,Building_A,"Building A",3,"(X=0.000,Y=0.000,Z=0.000)","(X=1000.000,Y=1000.000,Z=1000.000)"
+Row_002,Building_B,"Building B",3,"(X=0.000,Y=0.000,Z=0.000)","(X=1000.000,Y=1000.000,Z=1000.000)"

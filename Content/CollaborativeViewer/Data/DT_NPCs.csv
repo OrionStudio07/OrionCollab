@@ -1,0 +1,2 @@
+Name,NPCID,NPCType,ZoneID,AnimationSet,PatrolPath
+Row_001,Worker_01,AmbientWorker,Zone_101,CheckingGauges,"/Game/Splines/Patrol_01"
