@@ -15,4 +15,10 @@ try:
 except Exception as e:
     print("ERROR running import_data_tables:", e)
 
+try:
+    import setup_camera_sweep
+    setup_camera_sweep.create_sweep_assets()
+except Exception as e:
+    print("ERROR running setup_camera_sweep:", e)
+
 print("--- AUTOMATED ASSET SETUP COMPLETED ---")

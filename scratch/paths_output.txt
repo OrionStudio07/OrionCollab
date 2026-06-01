@@ -1,0 +1,4 @@
+--- PRINTING OBJECT PATHS ---
+EditorActorSubsystem path: /Engine/Transient.EditorEngine_0:EditorActorSubsystem_0
+World: Untitled
+OrionHierarchyManager path: /Temp/Untitled_0.Untitled:OrionHierarchyManager_0

@@ -1,0 +1,3 @@
+--- INSPECTING REMOTE CONTROL SETTINGS ---
+Found class: /Script/RemoteControlCommon.RemoteControlSettings
+Properties:

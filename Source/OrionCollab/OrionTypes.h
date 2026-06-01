@@ -123,6 +123,14 @@ enum class EAnnotationCategory : uint8
     DesignReview   UMETA(DisplayName = "Design Review")
 };
 
+UENUM(BlueprintType)
+enum class EOrionSweepSpeed : uint8
+{
+    Fast    = 0  UMETA(DisplayName = "Fast (1s)"),
+    Medium  = 1  UMETA(DisplayName = "Medium (2s)"),
+    Slow    = 2  UMETA(DisplayName = "Slow (3s)")
+};
+
 class AActor;
 
 USTRUCT(BlueprintType)

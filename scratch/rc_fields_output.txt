@@ -1,0 +1,3 @@
+--- INSPECTING REMOTE CONTROL FIELDS ---
+Class: /Script/RemoteControlCommon.RemoteControlSettings
+Global error: 'Class' object has no attribute 'list_fields'

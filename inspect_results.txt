@@ -1,0 +1,6 @@
+Spawned pawn instance: <Object '/Temp/Untitled_0.Untitled:PersistentLevel.BP_BasePawn_C_0' (0x0000024B33817000) Class 'BP_BasePawn_C'>
+Number of subobject handles: 9
+Loaded component class: <Object '/Game/CollaborativeViewer/Blueprints/Pawn/BP_CameraSweepManager.BP_CameraSweepManager_C' (0x0000024B333CA800) Class 'BlueprintGeneratedClass'>
+Add subobject valid: True
+Fail reason: 
+Found components of type OrionCameraSweepManager on instance: 1

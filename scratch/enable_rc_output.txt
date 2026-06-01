@@ -1,0 +1,4 @@
+--- ENABLING REMOTE CONTROL SETTINGS ---
+bAllowConsoleCommandRemoteExecution set to True
+bEnableRemotePythonExecution set to True
+Failed to save_config(): 'DeveloperSettings' object has no attribute 'save_config'
