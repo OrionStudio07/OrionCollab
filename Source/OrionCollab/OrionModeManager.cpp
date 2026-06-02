@@ -1,6 +1,8 @@
 // OrionModeManager.cpp
 #include "OrionModeManager.h"
 #include "Engine/World.h"
+#include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogOrionModeManager, Log, All);
 
@@ -57,6 +59,43 @@ void UOrionModeManager::OnWorldBeginPlay(UWorld& InWorld)
 
         // Fire delegate to alert any listening entities in the newly loaded level
         OnModeChanged.Broadcast(OldMode, CurrentMode);
+    }
+    // Direct level play fallback (PIE convenience)
+    else
+    {
+        EOrionMode OldMode = CurrentMode;
+        CurrentMode = EOrionMode::MODE_SHOWCASE;
+        CurrentRole = EOrionRole::ROLE_ADMIN;
+        
+        UE_LOG(LogOrionModeManager, Log, TEXT("Direct PIE level play detected without launcher. Defaulting to Showcase mode and Admin role."));
+        OnModeChanged.Broadcast(OldMode, CurrentMode);
+    }
+
+    // Programmatically spawn WBP_OrionRoot and collapse default CVT UI on level start
+    if (InWorld.IsGameWorld())
+    {
+        UClass* WidgetClass = StaticLoadClass(UUserWidget::StaticClass(), nullptr, TEXT("/Game/CollaborativeViewer/UMG/WBP_OrionRoot.WBP_OrionRoot_C"));
+        if (WidgetClass)
+        {
+            UUserWidget* RootWidget = CreateWidget<UUserWidget>(&InWorld, WidgetClass);
+            if (RootWidget)
+            {
+                RootWidget->AddToViewport(0);
+                UE_LOG(LogOrionModeManager, Log, TEXT("WBP_OrionRoot successfully added to viewport."));
+            }
+        }
+
+        // Surgical collapse of default CVT template UI to avoid overlaps
+        TArray<UUserWidget*> FoundWidgets;
+        UWidgetBlueprintLibrary::GetAllWidgetsOfClass(&InWorld, FoundWidgets, UUserWidget::StaticClass(), true);
+        for (UUserWidget* Widget : FoundWidgets)
+        {
+            if (Widget && Widget->GetClass()->GetName().Contains(TEXT("Destop_UI")))
+            {
+                Widget->SetVisibility(ESlateVisibility::Collapsed);
+                UE_LOG(LogOrionModeManager, Log, TEXT("Surgically collapsed default CVT Destop_UI widget."));
+            }
+        }
     }
 }
 

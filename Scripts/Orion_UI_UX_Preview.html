@@ -1,0 +1,2333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orion Studios — Full UI/UX Interactive Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS  [implementation_plan.md §0.3]
+═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg-base:       #070D18;
+  --bg-deep:       #040910;
+  --bg-panel:      rgba(10,22,42,0.78);
+  --bg-card:       rgba(12,24,46,0.9);
+  --border:        rgba(255,255,255,0.07);
+  --border-glow:   rgba(0,212,170,0.3);
+  --accent:        #00D4AA;
+  --accent-dim:    rgba(0,212,170,0.12);
+  --accent-glow:   rgba(0,212,170,0.35);
+  --warn:          #FFB74D;
+  --warn-dim:      rgba(255,183,77,0.12);
+  --alert:         #FF5252;
+  --alert-dim:     rgba(255,82,82,0.12);
+  --txt-hi:        rgba(255,255,255,0.95);
+  --txt-mid:       rgba(255,255,255,0.6);
+  --txt-lo:        rgba(255,255,255,0.35);
+  --font:          'Outfit',sans-serif;
+  --mono:          'JetBrains Mono',monospace;
+  --ease:          cubic-bezier(0.25,0.8,0.25,1);
+  --slide:         0.32s var(--ease);
+  --fade:          0.2s ease;
+  --panel-w:       320px;
+  --detail-w:      380px;
+  --topbar-h:      58px;
+  --bottombar-h:   52px;
+}
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;}
+body{
+  background:var(--bg-base);
+  color:var(--txt-hi);
+  font-family:var(--font);
+  font-size:14px;
+  height:100vh;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  background-image:
+    radial-gradient(ellipse at 10% 0%, rgba(5,30,70,0.5) 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 100%, rgba(0,60,55,0.3) 0%, transparent 55%),
+    linear-gradient(rgba(255,255,255,0.004) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.004) 1px, transparent 1px);
+  background-size:100% 100%,100% 100%,36px 36px,36px 36px;
+}
+/* scrollbars */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-glow);border-radius:4px}
+
+/* ── GLASS ── */
+.glass{
+  background:var(--bg-panel);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.55);
+  transition:border-color var(--fade);
+}
+.glass:hover{border-color:var(--border-glow)}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOP BAR  [trd.md §5.1 WBP_TopBar]
+═══════════════════════════════════════════════════════════════ */
+#topbar{
+  height:var(--topbar-h);
+  padding:0 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(4,9,16,0.92);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(10px);
+  z-index:200;
+  flex-shrink:0;
+}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-logo{
+  width:34px;height:34px;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent),#009E82);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:15px;color:#04090E;
+  box-shadow:0 0 18px var(--accent-glow);
+  transition:var(--slide);
+}
+.brand-name{font-size:15px;font-weight:600}
+.brand-sub{font-size:10px;color:var(--txt-mid);text-transform:uppercase;letter-spacing:.5px}
+
+/* breadcrumb  [implementation_plan.md §0.3 — Dashboard-style HUD with breadcrumb] */
+#breadcrumb{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;color:var(--txt-mid);
+  font-family:var(--mono);
+}
+#breadcrumb .bc-sep{color:var(--txt-lo)}
+#breadcrumb .bc-item{
+  cursor:pointer;padding:3px 7px;border-radius:4px;
+  transition:var(--fade);
+}
+#breadcrumb .bc-item:hover{color:var(--accent);background:var(--accent-dim)}
+#breadcrumb .bc-item.current{color:var(--txt-hi);cursor:default}
+
+/* mode pills */
+.mode-strip{
+  display:flex;background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.05);
+  border-radius:30px;padding:3px;gap:3px;
+}
+.mode-pill{
+  background:transparent;border:none;color:var(--txt-mid);
+  padding:5px 16px;font-family:var(--font);font-size:12px;font-weight:600;
+  border-radius:20px;cursor:pointer;transition:var(--slide);
+}
+.mode-pill.on{background:var(--accent);color:#04090E;box-shadow:0 0 12px var(--accent-glow)}
+.mode-pill:hover:not(.on){color:var(--txt-hi)}
+
+/*
+  Camera modes [prd.md §Pawn Architecture]:
+  - OrbitMode: arc-pivot around target, collision-aware, default in SHOWCASE
+  - WalkMode:  first-person ground navigation, default in OPERATIONS
+  - FlyMode:   free aerial camera (no collision) — THIS IS also the "Drone" camera.
+               prd.md explicitly states: "No new Drone pawn — FlyMode pawn extended"
+               Features: WASD pan, Q/E altitude, Shift fast, Ctrl slow [impl_plan §2.4]
+  - VR toggle: routes to BP_VRPawn (any mode) [prd.md line 164]
+*/
+.cam-strip{
+  display:flex;align-items:center;gap:4px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.05);
+  border-radius:8px;padding:3px;
+}
+.cam-btn{
+  background:transparent;border:none;color:var(--txt-mid);
+  padding:4px 10px;font-family:var(--font);font-size:11px;font-weight:600;
+  border-radius:5px;cursor:pointer;transition:var(--fade);display:flex;
+  align-items:center;gap:5px;
+}
+.cam-btn.on{background:rgba(255,255,255,0.06);color:var(--txt-hi)}
+.cam-btn:hover:not(.on){color:var(--txt-hi)}
+.cam-indicator{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 6px var(--accent);
+  display:inline-block;
+}
+/* VR button distinct styling */
+.cam-btn.vr-btn.on{
+  background:rgba(138,43,226,0.18);
+  border:1px solid rgba(138,43,226,0.4);
+  color:#C084FC;
+  box-shadow:0 0 10px rgba(138,43,226,0.3);
+}
+
+/* right cluster */
+.topbar-right{display:flex;align-items:center;gap:10px}
+.role-badge{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);
+  padding:4px 12px;border-radius:6px;font-size:11px;
+}
+.role-badge label{color:var(--txt-lo);font-size:9px;text-transform:uppercase;letter-spacing:.5px}
+.role-val{color:var(--accent);font-weight:700}
+.icon-btn{
+  width:32px;height:32px;border-radius:6px;background:transparent;
+  border:1px solid var(--border);color:var(--txt-mid);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:var(--fade);
+}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent)}
+.icon-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+
+/* ═══════════════════════════════════════════════════════════════
+   WORKSPACE
+═══════════════════════════════════════════════════════════════ */
+#workspace{
+  flex:1;display:flex;position:relative;overflow:hidden;
+  background:linear-gradient(180deg,#08101E 0%,#05090F 100%);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LEFT SIDE PANEL  [trd.md §5.1 WBP_SidePanel]
+═══════════════════════════════════════════════════════════════ */
+#sidepanel{
+  width:var(--panel-w);flex-shrink:0;
+  display:flex;flex-direction:column;
+  border-right:1px solid var(--border);
+  background:rgba(5,10,20,0.7);
+  backdrop-filter:blur(14px);
+  z-index:50;
+  transition:transform var(--slide);
+}
+#sidepanel.hidden{transform:translateX(calc(-1 * var(--panel-w)))}
+
+/* panel header with back button */
+.panel-hdr{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 14px 10px;
+  border-bottom:1px solid var(--border);
+  min-height:46px;
+}
+.panel-hdr-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--txt-mid);flex:1}
+.back-btn{
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  color:var(--txt-mid);padding:4px 8px;border-radius:5px;
+  font-size:11px;cursor:pointer;display:flex;align-items:center;gap:4px;
+  transition:var(--fade);flex-shrink:0;
+}
+.back-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* search  [trd.md §5.1 WBP_SearchPanel] */
+#search-box{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.06);
+  border-radius:7px;padding:8px 12px;margin:10px;
+  transition:var(--fade);
+}
+#search-box:focus-within{border-color:var(--accent);box-shadow:0 0 8px var(--accent-glow)}
+#search-input{
+  background:transparent;border:none;outline:none;
+  color:var(--txt-hi);font-family:var(--font);font-size:13px;flex:1;
+}
+#search-input::placeholder{color:var(--txt-lo)}
+.search-clear{
+  background:transparent;border:none;color:var(--txt-lo);cursor:pointer;
+  font-size:16px;line-height:1;transition:var(--fade);display:none;
+}
+.search-clear:hover{color:var(--txt-hi)}
+#search-results{
+  margin:0 10px 10px;display:flex;flex-direction:column;gap:4px;
+  max-height:180px;overflow-y:auto;
+}
+.sr-item{
+  padding:8px 10px;border-radius:6px;background:rgba(255,255,255,0.02);
+  cursor:pointer;font-size:12px;display:flex;justify-content:space-between;
+  align-items:center;border:1px solid transparent;transition:var(--fade);
+}
+.sr-item:hover{background:rgba(255,255,255,0.05);border-color:var(--border-glow);color:var(--accent)}
+.sr-cat{
+  font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px;
+  background:rgba(255,255,255,0.05);color:var(--txt-lo);
+}
+
+/* tree browser  [trd.md §5.3] */
+#tree-container{flex:1;overflow-y:auto;padding:4px 0}
+.tree-row{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 14px;cursor:pointer;font-size:13px;
+  border-left:2px solid transparent;
+  transition:var(--fade);
+}
+.tree-row:hover{background:rgba(255,255,255,0.03)}
+.tree-row.sel{
+  background:var(--accent-dim);color:var(--accent);
+  font-weight:600;border-left-color:var(--accent);
+}
+.tree-arrow{
+  font-size:7px;color:var(--txt-lo);width:10px;text-align:center;
+  transition:transform .2s;flex-shrink:0;
+}
+.tree-arrow.open{transform:rotate(90deg);color:var(--accent)}
+.tree-pill{
+  margin-left:auto;font-family:var(--mono);font-size:9px;
+  background:rgba(255,255,255,0.04);padding:1px 5px;border-radius:3px;color:var(--txt-lo);
+  flex-shrink:0;
+}
+.tree-row.sel .tree-pill{background:rgba(0,212,170,.15);color:var(--accent)}
+.tree-indent-1{padding-left:28px}
+.tree-indent-2{padding-left:44px}
+
+/* bottom tree count */
+.tree-footer{
+  padding:8px 14px;font-size:10px;color:var(--txt-lo);
+  border-top:1px solid var(--border);font-family:var(--mono);
+  display:flex;justify-content:space-between;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   3D VIEWPORT CANVAS
+═══════════════════════════════════════════════════════════════ */
+#viewport{
+  flex:1;position:relative;overflow:hidden;
+  background:#060C16;
+}
+.vp-grid{
+  position:absolute;width:200%;height:200%;
+  background-image:
+    linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px);
+  background-size:40px 40px;
+  transform:perspective(700px) rotateX(62deg) translateY(-160px);
+  transform-origin:center top;
+  animation:grid-scroll 30s linear infinite;
+}
+@keyframes grid-scroll{to{background-position:0 600px}}
+#machine-stage{
+  position:absolute;inset:0;display:flex;
+  align-items:center;justify-content:center;
+  z-index:2;pointer-events:none;
+}
+.machine{
+  width:260px;height:260px;
+  transform-style:preserve-3d;
+  transform:perspective(800px) rotateY(30deg) rotateX(15deg);
+  transition:transform 1.2s var(--ease);
+  position:relative;
+}
+.layer{
+  position:absolute;width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .7s var(--ease),opacity .5s;
+}
+.msvg{width:210px;height:210px;filter:drop-shadow(0 12px 25px rgba(0,0,0,.7))}
+
+/* tool visual states */
+.machine.xray .msvg path{
+  stroke:var(--accent);stroke-width:1.5;fill:rgba(0,212,170,.03)!important;
+  stroke-dasharray:4;animation:dash 20s linear infinite;
+}
+.machine.xray .msvg .pipe-path{stroke:#4FC3F7}
+.machine.xray .msvg .elec-path{stroke:#FFD54F}
+@keyframes dash{to{stroke-dashoffset:1000}}
+
+.machine.expl-1 .l-top{transform:translateY(-60px)}
+.machine.expl-1 .l-bot{transform:translateY(60px)}
+.machine.expl-2 .l-top{transform:translateY(-110px)}
+.machine.expl-2 .l-bot{transform:translateY(110px)}
+.machine.expl-3 .l-top{transform:translateY(-160px)}
+.machine.expl-3 .l-bot{transform:translateY(160px)}
+.layer.hidden-comp{opacity:.12}
+
+/* annotation pin  [trd.md §3.3] */
+.annot-pin{
+  position:absolute;background:var(--bg-card);
+  border:1px solid var(--accent);border-radius:6px;
+  padding:6px 10px;font-size:11px;z-index:10;
+  pointer-events:none;display:none;
+  animation:fadeIn .3s var(--ease);
+}
+.annot-pin::after{
+  content:"";position:absolute;bottom:-8px;left:50%;
+  transform:translateX(-50%);
+  border:4px solid transparent;border-top-color:var(--accent);
+}
+
+/* explode callout labels  [prd.md §34] */
+.expl-label{
+  position:absolute;background:rgba(4,9,16,.9);
+  border:1px solid var(--accent);padding:4px 10px;
+  border-radius:5px;font-size:10px;font-family:var(--mono);
+  color:var(--accent);display:none;pointer-events:none;
+  animation:fadeIn .3s ease;
+}
+
+/* measurement overlay */
+#meas-svg{position:absolute;inset:0;pointer-events:none;z-index:5}
+.meas-line{stroke:var(--accent);stroke-width:2;stroke-dasharray:5 3;animation:dash 8s linear infinite}
+.meas-node{fill:var(--bg-base);stroke:var(--accent);stroke-width:2}
+.meas-ring{fill:none;stroke:var(--accent);stroke-width:2;animation:pulse-ring 1s ease infinite}
+@keyframes pulse-ring{0%{r:8;opacity:1}100%{r:18;opacity:0}}
+.meas-label{
+  position:absolute;background:var(--bg-card);border:1px solid var(--accent);
+  color:var(--accent);font-family:var(--mono);font-size:11px;font-weight:600;
+  padding:3px 8px;border-radius:4px;display:none;pointer-events:none;z-index:6;
+}
+
+/* crop box slice  [trd.md §3.3] */
+.section-hatch{fill:url(#hatch)!important;stroke:var(--alert)!important;stroke-width:2!important}
+
+/* section-cut plane line */
+.section-plane-line{
+  position:absolute;left:20%;right:20%;
+  height:2px;background:var(--alert);
+  box-shadow:0 0 12px var(--alert),0 0 24px rgba(255,82,82,.4);
+  display:none;pointer-events:none;z-index:5;
+  transition:top .4s ease;
+}
+
+/* floating annotation badge */
+#annot-badge{top:32%;left:62%}
+#bkmk-badge{top:52%;left:58%}
+
+/* HUD overlays */
+.hud-zone-label{
+  position:absolute;top:18px;left:16px;
+  background:rgba(4,9,16,.8);border:1px solid var(--border);
+  padding:7px 14px;border-radius:6px;
+  font-size:11px;font-family:var(--mono);color:var(--accent);font-weight:600;
+  pointer-events:none;z-index:6;
+}
+.hud-save-badge{
+  position:absolute;top:18px;right:16px;
+  background:rgba(0,212,170,.12);border:1px solid var(--accent);
+  padding:5px 12px;border-radius:6px;
+  font-size:10px;font-family:var(--mono);color:var(--accent);
+  display:none;pointer-events:none;z-index:6;
+  animation:fadeIn .3s ease;
+}
+.hud-debug{
+  position:absolute;bottom:62px;left:16px;
+  font-size:10px;font-family:var(--mono);color:var(--txt-lo);
+  pointer-events:none;z-index:6;display:flex;flex-direction:column;gap:2px;
+}
+
+/* ─── MINIMAP  [trd.md §5.1] ─── */
+#minimap{
+  position:absolute;bottom:62px;right:16px;
+  width:160px;height:160px;border-radius:50%;overflow:hidden;
+  border:2px solid var(--border);background:var(--bg-deep);
+  cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.8);
+  z-index:10;display:none;transition:var(--slide);
+}
+#minimap:hover{border-color:var(--accent);box-shadow:0 0 18px var(--accent-glow)}
+.radar-sweep{
+  position:absolute;inset:0;border-radius:50%;
+  background:linear-gradient(45deg,transparent 50%,rgba(0,212,170,.07) 100%);
+  animation:spin 4s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mm-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(0,212,170,.02) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,212,170,.02) 1px,transparent 1px);
+  background-size:14px 14px;background-position:center;
+}
+.mm-dot{
+  position:absolute;width:8px;height:8px;border-radius:50%;
+  background:var(--accent);transform:translate(-50%,-50%);
+  box-shadow:0 0 7px var(--accent);transition:var(--slide);
+}
+.mm-dot.active{background:var(--warn);box-shadow:0 0 10px var(--warn);animation:pulse-dot 1s alternate infinite}
+@keyframes pulse-dot{to{transform:translate(-50%,-50%) scale(1.3)}}
+.mm-player{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) rotate(45deg);
+  width:14px;height:14px;z-index:4;
+  transition:top .4s ease,left .4s ease,transform .4s ease;
+}
+.mm-arrow{
+  width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;
+  border-bottom:14px solid var(--accent);filter:drop-shadow(0 0 5px var(--accent));
+}
+.mm-floor{
+  position:absolute;top:8px;left:8px;
+  background:rgba(4,9,16,.9);border:1px solid var(--border);
+  border-radius:3px;padding:1px 5px;font-size:8px;font-family:var(--mono);
+  font-weight:700;color:var(--accent);
+}
+
+/* ─── TOOL PALETTE BOTTOM BAR [trd.md §5.1 WBP_BottomBar] ─── */
+#bottombar{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  height:var(--bottombar-h);
+  display:flex;align-items:center;gap:6px;
+  padding:0 14px;z-index:20;
+}
+.bb-group{display:flex;align-items:center;gap:4px}
+.bb-div{width:1px;height:28px;background:var(--border);margin:0 4px}
+.tool-btn{
+  width:38px;height:38px;border-radius:8px;
+  background:rgba(4,9,16,.7);border:1px solid var(--border);
+  color:var(--txt-mid);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:var(--fade);position:relative;
+  backdrop-filter:blur(8px);
+}
+.tool-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,212,170,.06)}
+.tool-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);box-shadow:0 0 10px rgba(0,212,170,.2)}
+.tool-btn .tt{
+  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:rgba(4,9,16,.95);border:1px solid var(--border);
+  padding:4px 8px;border-radius:4px;font-size:10px;white-space:nowrap;
+  color:var(--txt-hi);pointer-events:none;opacity:0;
+  transition:opacity .15s;z-index:30;
+}
+.tool-btn:hover .tt{opacity:1}
+.meas-readout{
+  font-family:var(--mono);font-size:11px;color:var(--accent);
+  font-weight:600;padding:0 10px;
+}
+.snap-status{
+  font-size:10px;color:var(--txt-lo);font-family:var(--mono);padding:0 6px;
+}
+
+/* ─── RADIAL TOOL WHEEL  [trd.md §5.1 WBP_ToolRadialMenu] ─── */
+#radial-overlay{
+  position:absolute;inset:0;z-index:100;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.3);backdrop-filter:blur(4px);
+}
+#radial-wheel{
+  width:280px;height:280px;position:relative;
+  border-radius:50%;border:1px solid var(--border);
+  background:rgba(6,12,24,.9);backdrop-filter:blur(20px);
+  box-shadow:0 0 60px rgba(0,0,0,.8);
+}
+.rad-item{
+  position:absolute;display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;transition:var(--fade);
+}
+.rad-icon{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  transition:var(--fade);
+}
+.rad-icon svg{pointer-events:none}
+.rad-item:hover .rad-icon{
+  background:var(--accent-dim);border-color:var(--accent);
+  box-shadow:0 0 14px var(--accent-glow);
+}
+.rad-item:hover .rad-label{color:var(--accent)}
+.rad-label{font-size:9px;color:var(--txt-mid);font-weight:600;text-transform:uppercase;letter-spacing:.5px;text-align:center}
+.rad-center{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:60px;height:60px;border-radius:50%;
+  background:rgba(4,9,16,.95);border:1px solid var(--border-glow);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:var(--txt-mid);text-align:center;cursor:pointer;
+}
+
+/* ─── RIGHT DETAILS PANEL [trd.md §5.1 WBP_EquipmentDetails] ─── */
+#details{
+  width:var(--detail-w);flex-shrink:0;
+  border-left:1px solid var(--border);
+  background:rgba(5,10,20,.75);
+  backdrop-filter:blur(14px);
+  display:flex;flex-direction:column;
+  transform:translateX(0);
+  transition:transform var(--slide);
+  z-index:50;
+}
+#details.closed{transform:translateX(var(--detail-w))}
+
+.dtabs{display:flex;border-bottom:1px solid var(--border);background:rgba(0,0,0,.2)}
+.dtab{
+  flex:1;background:transparent;border:none;color:var(--txt-lo);
+  padding:13px 4px;font-family:var(--font);font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;cursor:pointer;
+  transition:var(--fade);text-align:center;border-bottom:2px solid transparent;
+}
+.dtab:hover{color:var(--txt-hi)}
+.dtab.on{color:var(--accent);border-bottom-color:var(--accent);background:rgba(0,212,170,.02)}
+.dpane{display:none;flex:1;overflow-y:auto;padding:16px}
+.dpane.on{display:flex;flex-direction:column;gap:14px}
+
+/* spec grid */
+.spec-grid{width:100%;border-collapse:collapse}
+.spec-grid tr{border-bottom:1px solid rgba(255,255,255,.03)}
+.spec-grid td{padding:8px 4px;font-size:12px}
+.spec-grid td.lbl{color:var(--txt-mid);width:44%}
+.spec-grid td.val{font-weight:500;text-align:right}
+.badge{
+  display:inline-block;padding:2px 8px;border-radius:10px;
+  font-size:9px;font-weight:700;text-transform:uppercase;border:1px solid;
+}
+.badge.ok{background:var(--accent-dim);color:var(--accent);border-color:rgba(0,212,170,.25)}
+.badge.warn{background:var(--warn-dim);color:var(--warn);border-color:rgba(255,183,77,.25)}
+.badge.err{background:var(--alert-dim);color:var(--alert);border-color:rgba(255,82,82,.25)}
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--txt-mid);margin-bottom:8px}
+
+/* components checklist */
+.comp-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;background:rgba(255,255,255,.02);
+  border:1px solid var(--border);border-radius:7px;cursor:pointer;
+  transition:var(--fade);font-size:12px;
+}
+.comp-row:hover{border-color:var(--accent);background:rgba(255,255,255,.04)}
+.comp-row .status-shape{
+  width:10px;height:10px;flex-shrink:0;
+  background:var(--accent);border-radius:50%;
+}
+.comp-row .status-shape.warn{background:var(--warn)}
+.comp-row .status-shape.overdue{background:var(--alert);border-radius:0}
+.comp-chk{
+  appearance:none;width:15px;height:15px;
+  border:1px solid var(--txt-lo);border-radius:3px;
+  outline:none;background:transparent;cursor:pointer;
+  position:relative;flex-shrink:0;
+  transition:var(--fade);
+}
+.comp-chk:checked{background:var(--accent);border-color:var(--accent)}
+.comp-chk:checked::after{content:"✓";position:absolute;color:#04090E;font-size:10px;font-weight:900;top:50%;left:50%;transform:translate(-50%,-50%)}
+
+/* ACTIONS TAB  [implementation_plan.md §4.1] */
+.action-grid{display:flex;flex-direction:column;gap:8px}
+.action-row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:7px;
+  background:rgba(255,255,255,.02);border:1px solid var(--border);
+  cursor:pointer;transition:var(--fade);
+}
+.action-row:hover{background:rgba(255,255,255,.05);border-color:var(--border-glow)}
+.action-icon{
+  width:32px;height:32px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.action-icon.teal{background:var(--accent-dim)}
+.action-icon.amber{background:var(--warn-dim)}
+.action-icon.red{background:var(--alert-dim)}
+.action-name{font-size:13px;font-weight:500;flex:1}
+.action-sub{font-size:10px;color:var(--txt-lo);display:block;margin-top:1px}
+.action-arrow{color:var(--txt-lo);font-size:12px}
+
+/* Drawings tab */
+.cad-frame{
+  background:#0B1624;border-radius:6px;height:210px;
+  border:1px solid rgba(255,255,255,.05);overflow:hidden;
+  position:relative;cursor:grab;display:flex;align-items:center;justify-content:center;
+}
+.cad-frame:active{cursor:grabbing}
+.cad-ctrl{display:flex;align-items:center;gap:10px;margin-top:10px}
+.cad-ctrl input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer}
+.cad-ctrl button{
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  color:var(--txt-mid);padding:4px 10px;border-radius:5px;
+  font-size:11px;cursor:pointer;font-family:var(--font);
+  transition:var(--fade);
+}
+.cad-ctrl button:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Telemetry sparklines */
+.sensor-card{
+  background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.04);
+  border-radius:7px;padding:12px;
+}
+.sensor-hdr{display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);color:var(--accent);margin-bottom:8px;font-weight:600}
+.sparkline{height:44px;display:flex;align-items:flex-end;gap:2px}
+.spark-bar{flex:1;background:var(--accent);opacity:.6;transition:height .25s}
+
+/* ─── GUIDED TOUR CARD  [implementation_plan.md §3.1] ─── */
+#tour-card{
+  position:absolute;bottom:72px;left:50%;transform:translateX(-50%);
+  width:500px;padding:16px;z-index:30;
+  display:none;animation:slideUp .4s var(--ease);
+}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%);opacity:1}}
+.tour-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.tour-title{font-size:13px;font-weight:700;color:var(--accent)}
+.tour-ct{font-size:10px;font-family:var(--mono);color:var(--txt-lo)}
+.tour-body{font-size:12px;line-height:1.55;color:rgba(255,255,255,.8);margin-bottom:12px;min-height:36px}
+.tour-prog-bg{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:12px}
+.tour-prog-fill{height:100%;background:var(--accent);width:0;transition:width .15s linear}
+.tour-controls{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tour-btn{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  color:var(--txt-hi);padding:6px 12px;border-radius:5px;
+  font-size:11px;cursor:pointer;font-family:var(--font);transition:var(--fade);
+}
+.tour-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tour-btn.primary{background:var(--accent);color:#04090E;font-weight:700;border-color:var(--accent)}
+.tour-btn.primary:hover{background:#00FFCC}
+.tour-btn.close-btn{color:var(--txt-lo)}
+.tour-btn.close-btn:hover{color:var(--alert);border-color:var(--alert)}
+
+/* ─── TOAST NOTIFICATIONS [trd.md §5.1 WBP_Notification] ─── */
+#toast-stack{
+  position:absolute;bottom:72px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;gap:6px;z-index:150;
+  align-items:center;pointer-events:none;
+}
+.toast{
+  background:rgba(6,12,24,.95);border-radius:8px;
+  padding:10px 16px;font-size:12px;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.6);
+  animation:toastIn .3s var(--ease);
+  min-width:280px;max-width:400px;
+  border:1px solid var(--border);
+}
+.toast.ok{border-left:3px solid var(--accent)}
+.toast.warn{border-left:3px solid var(--warn)}
+.toast.err{border-left:3px solid var(--alert)}
+@keyframes toastIn{from{transform:translateY(12px);opacity:0}to{opacity:1;transform:translateY(0)}}
+
+/* ─── SAVE STATE PANEL [trd.md §8] ─── */
+#save-panel{
+  position:absolute;top:68px;right:60px;width:280px;
+  z-index:80;display:none;animation:fadeIn .25s ease;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.save-slot{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:6px;background:rgba(255,255,255,.02);
+  border:1px solid var(--border);margin-bottom:6px;cursor:pointer;
+  transition:var(--fade);font-size:12px;
+}
+.save-slot:hover{border-color:var(--accent);background:rgba(255,255,255,.04)}
+.save-dot{width:8px;height:8px;border-radius:50%;background:var(--txt-lo);flex-shrink:0}
+.save-dot.used{background:var(--accent);box-shadow:0 0 6px var(--accent)}
+.slot-acts{display:flex;gap:6px;margin-left:auto}
+.slot-btn{
+  background:transparent;border:1px solid var(--border);color:var(--txt-mid);
+  padding:2px 7px;border-radius:4px;font-size:10px;cursor:pointer;
+  transition:var(--fade);font-family:var(--font);
+}
+.slot-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ─── SETTINGS / ACCESSIBILITY MODAL ─── */
+#settings-modal{
+  position:absolute;inset:0;z-index:200;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(8px);
+}
+.modal-card{width:420px;padding:24px;display:flex;flex-direction:column;gap:18px;animation:fadeIn .25s ease}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.modal-hdr h3{font-size:15px;font-weight:700}
+.modal-close{background:transparent;border:none;color:var(--txt-lo);font-size:18px;cursor:pointer;transition:var(--fade)}
+.modal-close:hover{color:var(--alert)}
+.toggle-row{display:flex;justify-content:space-between;align-items:center}
+.tgl{
+  width:40px;height:20px;background:rgba(255,255,255,.1);
+  border-radius:10px;position:relative;cursor:pointer;transition:var(--fade);flex-shrink:0;
+}
+.tgl.on{background:var(--accent)}
+.tgl-nob{
+  width:16px;height:16px;background:#fff;border-radius:50%;
+  position:absolute;top:2px;left:2px;transition:var(--fade);
+}
+.tgl.on .tgl-nob{left:22px}
+.seg-ctrl{display:flex;gap:4px}
+.seg-btn{
+  flex:1;background:rgba(255,255,255,.03);border:1px solid var(--border);
+  color:var(--txt-mid);padding:6px;border-radius:5px;
+  font-size:11px;cursor:pointer;text-align:center;font-family:var(--font);
+  font-weight:600;transition:var(--fade);
+}
+.seg-btn.on{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+
+/* ─── ANNOTATION PANEL  [trd.md §3.3] ─── */
+#annot-panel{
+  position:absolute;top:68px;left:calc(var(--panel-w) + 12px);
+  width:260px;z-index:80;display:none;animation:fadeIn .25s ease;
+}
+.annot-type-row{display:flex;gap:6px;margin-bottom:10px}
+.annot-type-btn{
+  flex:1;padding:5px;border-radius:5px;font-size:10px;font-weight:700;
+  border:1px solid var(--border);background:transparent;color:var(--txt-mid);
+  cursor:pointer;font-family:var(--font);transition:var(--fade);text-align:center;
+}
+.annot-type-btn:hover,.annot-type-btn.on{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
+.annot-type-btn.warn-type.on{border-color:var(--warn);background:var(--warn-dim);color:var(--warn)}
+.annot-type-btn.err-type.on{border-color:var(--alert);background:var(--alert-dim);color:var(--alert)}
+.annot-input{
+  width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.07);
+  border-radius:5px;padding:8px;color:var(--txt-hi);font-family:var(--font);
+  font-size:12px;outline:none;resize:none;height:72px;
+  transition:var(--fade);
+}
+.annot-input:focus{border-color:var(--accent)}
+
+/* ─── BOOKMARK PANEL  [trd.md §3.3] ─── */
+#bkmk-panel{
+  position:absolute;top:68px;right:calc(var(--detail-w) + 12px);
+  width:260px;z-index:80;display:none;animation:fadeIn .25s ease;
+}
+.bkmk-item{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;border-radius:6px;background:rgba(255,255,255,.02);
+  border:1px solid var(--border);cursor:pointer;transition:var(--fade);font-size:12px;
+  margin-bottom:5px;
+}
+.bkmk-item:hover{border-color:var(--accent);background:rgba(255,255,255,.04)}
+.bkmk-cat{
+  font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;
+  background:rgba(255,255,255,.04);color:var(--txt-lo);flex-shrink:0;
+}
+.bkmk-del{
+  margin-left:auto;background:transparent;border:none;
+  color:var(--txt-lo);cursor:pointer;font-size:14px;transition:var(--fade);
+}
+.bkmk-del:hover{color:var(--alert)}
+
+/* ─── RATIO SCALE PANEL  [trd.md §3.3] ─── */
+#scale-panel{
+  position:absolute;bottom:72px;left:50%;
+  transform:translateX(calc(-50% - 140px));
+  width:240px;z-index:80;display:none;animation:fadeIn .25s ease;
+}
+.scale-inner{padding:14px}
+.scale-slider-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.scale-slider-row input[type=range]{flex:1;accent-color:var(--accent)}
+.scale-val{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600;width:40px;text-align:right}
+
+/* ─── SNAPSHOT FLASH ─── */
+#snap-flash{
+  position:absolute;inset:0;background:#fff;opacity:0;
+  pointer-events:none;z-index:300;
+}
+#snap-flash.go{animation:snapflash .8s ease}
+@keyframes snapflash{0%{opacity:.9}100%{opacity:0}}
+
+/* ─── LAUNCHER SCREEN ─── */
+#launcher{
+  position:absolute;inset:0;z-index:500;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(3,7,14,.97);backdrop-filter:blur(20px);
+}
+.launcher-card{
+  width:460px;padding:36px;
+  background:rgba(10,20,40,.9);
+  border:1px solid var(--border);border-radius:14px;
+  box-shadow:0 30px 90px rgba(0,0,0,.9);
+  display:flex;flex-direction:column;gap:20px;
+  animation:scaleIn .4s var(--ease);
+}
+@keyframes scaleIn{from{transform:scale(.95);opacity:0}to{opacity:1;transform:scale(1)}}
+.lc-logo-area{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.lc-logo{
+  width:52px;height:52px;border-radius:12px;font-size:22px;font-weight:800;
+  background:linear-gradient(135deg,var(--accent),#009E82);color:#04090E;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 30px var(--accent-glow);
+}
+.lc-name{font-size:20px;font-weight:700}
+.lc-sub{font-size:11px;color:var(--txt-mid);text-transform:uppercase;letter-spacing:.8px}
+.form-grp{display:flex;flex-direction:column;gap:6px}
+.form-label{font-size:10px;font-weight:700;color:var(--txt-mid);text-transform:uppercase;letter-spacing:.5px}
+.form-sel{
+  background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08);
+  color:#fff;font-family:var(--font);padding:10px 12px;
+  border-radius:7px;font-size:14px;outline:none;cursor:pointer;transition:var(--fade);
+}
+.form-sel:focus{border-color:var(--accent)}
+.form-sel option{background:#0A1428}
+.seg-2{display:flex;gap:6px}
+.err-banner{
+  background:var(--alert-dim);border:1px solid var(--alert);
+  color:var(--alert);padding:10px 14px;border-radius:6px;font-size:12px;
+  display:flex;align-items:center;gap:8px;display:none;
+}
+.boot-btn{
+  background:var(--accent);color:#04090E;font-family:var(--font);
+  font-size:15px;font-weight:800;padding:14px;border-radius:8px;
+  border:none;cursor:pointer;letter-spacing:.5px;
+  box-shadow:0 4px 24px var(--accent-glow);transition:var(--slide);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.boot-btn:hover{background:#fff;box-shadow:0 4px 28px rgba(255,255,255,.25);transform:translateY(-1px)}
+.boot-btn:active{transform:translateY(1px)}
+</style>
+</head>
+<body>
+
+<!-- ═══ LAUNCHER SCREEN ═══ -->
+<div id="launcher">
+  <div class="launcher-card">
+    <div class="lc-logo-area">
+      <div class="lc-logo" id="lc-logo-char">M</div>
+      <div class="lc-name" id="lc-company">Morde Foods</div>
+      <div class="lc-sub" id="lc-plant">P2 Manufacturing Plant</div>
+    </div>
+
+    <!-- Missing config warning banner [prd.md §6] -->
+    <div class="err-banner" id="config-err">
+      ⚠️ OrionConfig.json not found — using embedded defaults.
+    </div>
+
+    <div class="form-grp">
+      <div class="form-label">Your Role [trd.md §3.2]</div>
+      <select class="form-sel" id="lc-role">
+        <option value="ADMIN">ADMIN — Full access to all modes</option>
+        <option value="ENGINEER">ENGINEER — Showcase + Operations</option>
+        <option value="VIEWER">VIEWER — Showcase only</option>
+      </select>
+    </div>
+
+    <div class="form-grp">
+      <div class="form-label">Rendering Quality [trd.md §11.2]</div>
+      <div class="seg-2" id="lc-quality">
+        <button class="seg-btn on" onclick="setLcSeg('lc-quality',this)">Epic Lumen (Desktop)</button>
+        <button class="seg-btn" onclick="setLcSeg('lc-quality',this)">Baked GI (VR 72fps)</button>
+      </div>
+    </div>
+
+    <div class="form-grp">
+      <div class="form-label">Output Target [trd.md §11.2]</div>
+      <div class="seg-2" id="lc-hardware">
+        <button class="seg-btn on" onclick="setLcSeg('lc-hardware',this)">Desktop Monitor</button>
+        <button class="seg-btn" onclick="setLcSeg('lc-hardware',this)">PC VR (SteamVR)</button>
+      </div>
+    </div>
+
+    <button class="boot-btn" onclick="bootApp()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Enter Orion Engine
+    </button>
+  </div>
+</div>
+
+<!-- ═══ SNAPSHOT FLASH ═══ -->
+<div id="snap-flash"></div>
+
+<!-- ════════════════════════════════════════════
+     TOP BAR
+════════════════════════════════════════════ -->
+<div id="topbar">
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand-logo" id="tb-logo">M</div>
+    <div>
+      <div class="brand-name" id="tb-company">Morde Foods</div>
+      <div class="brand-sub" id="tb-plant">P2 Manufacturing</div>
+    </div>
+  </div>
+
+  <!-- Breadcrumb NAV [implementation_plan.md §0.3] -->
+  <div id="breadcrumb">
+    <span class="bc-item" onclick="bcNav(0)">🏠 Plant</span>
+    <span class="bc-sep">›</span>
+    <span class="bc-item" id="bc1" onclick="bcNav(1)">Building_A</span>
+    <span class="bc-sep" id="bc-sep2">›</span>
+    <span class="bc-item" id="bc2" onclick="bcNav(2)">Room_101</span>
+    <span class="bc-sep" id="bc-sep3">›</span>
+    <span class="bc-item current" id="bc3">Mixer_01</span>
+  </div>
+
+  <!-- Mode Switcher [trd.md §3.2] -->
+  <div class="mode-strip">
+    <button class="mode-pill on" id="mp-showcase" onclick="setMode('SHOWCASE')">SHOWCASE</button>
+    <button class="mode-pill" id="mp-ops" onclick="setMode('OPERATIONS')">OPERATIONS</button>
+  </div>
+
+  <!-- Camera Mode Switcher [prd.md §Pawn Architecture]
+       3 modes: OrbitMode | WalkMode | FlyMode (= aerial/drone, no separate pawn per spec)
+       VR toggle → BP_VRPawn, any mode [prd.md line 164] -->
+  <div class="cam-strip">
+    <button class="cam-btn on" id="cm-orbit" onclick="setCam('ORBIT')" title="OrbitMode — arc-pivot, collision-aware [prd.md §162]">
+      <div class="cam-indicator"></div> Orbit
+    </button>
+    <button class="cam-btn" id="cm-walk" onclick="setCam('WALK')" title="WalkMode — first-person ground nav, gravity [prd.md §163]">🚶 Walk</button>
+    <button class="cam-btn" id="cm-fly" onclick="setCam('FLY')" title="FlyMode — free aerial, no collision. Q/E altitude, Shift/Ctrl speed [impl_plan §2.4]">🚁 Fly / Aerial</button>
+    <button class="cam-btn vr-btn" id="cm-vr" onclick="setCam('VR')" title="BP_VRPawn — PC VR tethered (SteamVR / Quest Link) [prd.md line 164]">🥽 VR</button>
+  </div>
+
+  <!-- Right Controls -->
+  <div class="topbar-right">
+    <div class="role-badge">
+      <label>ROLE</label>
+      <span class="role-val" id="tb-role">ADMIN</span>
+    </div>
+    <!-- Save State [trd.md §8] -->
+    <button class="icon-btn" id="btn-save" title="Save State [trd.md §8]" onclick="toggleSavePanel()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    </button>
+    <!-- Settings -->
+    <button class="icon-btn" id="btn-settings" title="Settings & Accessibility" onclick="openSettings()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9 1.65 1.65 0 004.27 7.18l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    </button>
+    <!-- Sidebar toggle -->
+    <button class="icon-btn" id="btn-sidebar" title="Toggle Sidebar" onclick="toggleSidebar()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     WORKSPACE
+════════════════════════════════════════════ -->
+<div id="workspace">
+
+  <!-- ── LEFT SIDE PANEL ── -->
+  <div id="sidepanel" class="glass" style="border-radius:0;border-right:1px solid var(--border)">
+    <!-- Panel header with context-aware back button -->
+    <div class="panel-hdr">
+      <button class="back-btn" id="panel-back" onclick="panelGoBack()" style="display:none">
+        ‹ Back
+      </button>
+      <span class="panel-hdr-title" id="panel-title">Plant Hierarchy</span>
+      <span style="font-family:var(--mono);font-size:9px;color:var(--txt-lo)" id="tree-count-badge">4 items</span>
+    </div>
+
+    <!-- WBP_SearchBar -->
+    <div id="search-box">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="search-input" placeholder="Fuzzy search (tag, P&ID, name)…" oninput="doSearch(this.value)">
+      <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+    </div>
+    <div id="search-results"></div>
+
+    <!-- WBP_TreeBrowser -->
+    <div id="tree-container"></div>
+
+    <div class="tree-footer">
+      <span id="tree-footer-txt">6,500 items virtual (4 loaded)</span>
+      <span style="color:var(--accent)">●  Ready</span>
+    </div>
+  </div>
+
+  <!-- ── 3D VIEWPORT ── -->
+  <div id="viewport">
+    <!-- Animated perspective grid -->
+    <div class="vp-grid"></div>
+
+    <!-- 3D machine stage (SVG layers) -->
+    <div id="machine-stage">
+      <div class="machine" id="machine">
+
+        <!-- SVG defs for hatch pattern -->
+        <svg width="0" height="0"><defs>
+          <pattern id="hatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="0" x2="0" y2="8" stroke="var(--alert)" stroke-width="1.8"/>
+          </pattern>
+        </defs></svg>
+
+        <!-- Layer: Motor (top) -->
+        <div class="layer l-top" id="comp-motor">
+          <svg class="msvg" viewBox="0 0 200 200">
+            <g fill="#12203A" stroke="var(--accent)" stroke-width="2">
+              <rect x="70" y="28" width="60" height="44" rx="3"/>
+              <line x1="82" y1="28" x2="82" y2="72" stroke-width="1.5"/>
+              <line x1="94" y1="28" x2="94" y2="72" stroke-width="1.5"/>
+              <line x1="106" y1="28" x2="106" y2="72" stroke-width="1.5"/>
+              <line x1="118" y1="28" x2="118" y2="72" stroke-width="1.5"/>
+              <rect x="88" y="18" width="24" height="10" rx="1" fill="#FFB74D" class="elec-path" stroke="none"/>
+              <rect x="88" y="18" width="24" height="10" rx="1" fill="none" stroke="var(--warn)" stroke-width="1"/>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Layer: Shaft (middle) -->
+        <div class="layer l-mid" id="comp-shaft">
+          <svg class="msvg" viewBox="0 0 200 200">
+            <g fill="#12203A" stroke="var(--accent)" stroke-width="2">
+              <rect x="82" y="80" width="36" height="38" rx="2"/>
+              <line x1="100" y1="68" x2="100" y2="126" stroke-dasharray="3 2"/>
+              <circle cx="91" cy="99" r="4" fill="#FF5252" class="pipe-path" stroke="none"/>
+              <circle cx="109" cy="99" r="4" fill="#FF5252" class="pipe-path" stroke="none"/>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Layer: Impeller/bowl (bottom) -->
+        <div class="layer l-bot" id="comp-bowl">
+          <svg class="msvg" viewBox="0 0 200 200">
+            <g fill="#12203A" stroke="var(--accent)" stroke-width="2">
+              <path d="M48 122 h104 v50 a52 52 0 0 1-104 0 z" class="pipe-path"/>
+              <path id="blade-svg" d="M78 152 l44 12 h-44 z" fill="var(--accent)" opacity=".4"/>
+              <rect x="88" y="180" width="24" height="14" fill="#FFB74D" class="elec-path" stroke="none"/>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Slice plane visual [trd.md §3.3] -->
+        <div class="layer l-mid" id="comp-slice" style="display:none;transform:scale(1.1)">
+          <svg class="msvg" viewBox="0 0 200 200">
+            <rect x="38" y="92" width="124" height="16" class="section-hatch"/>
+          </svg>
+        </div>
+
+      </div><!-- /machine -->
+    </div>
+
+    <!-- Annotation pins -->
+    <div class="annot-pin" id="annot-badge">⚙️ <strong>Motor Housing</strong><br><span style="color:var(--txt-mid);font-size:10px">SAFETY · Routine check</span></div>
+    <div class="annot-pin" id="bkmk-badge" style="border-color:var(--warn)">🔖 <strong>Shaft seal — inspect</strong><br><span style="color:var(--txt-mid);font-size:10px">MAINTENANCE</span></div>
+
+    <!-- Explode callout labels -->
+    <div class="expl-label" id="lbl-motor" style="top:20%;left:60%">TEFC Motor 15kW</div>
+    <div class="expl-label" id="lbl-shaft" style="top:46%;left:60%">Shaft Coupling Sleeve</div>
+    <div class="expl-label" id="lbl-bowl" style="top:72%;left:60%">Mixing Vessel &amp; Impeller</div>
+
+    <!-- Measurement SVG overlay -->
+    <svg id="meas-svg">
+      <defs>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <polyline id="meas-poly" class="meas-line" points="" style="display:none" filter="url(#glow)"/>
+      <circle id="meas-p1" class="meas-node" r="5" cx="0" cy="0" style="display:none"/>
+      <circle id="meas-p2" class="meas-node" r="5" cx="0" cy="0" style="display:none"/>
+      <circle id="meas-ring" class="meas-ring" cx="0" cy="0" style="display:none"/>
+    </svg>
+    <div class="meas-label" id="meas-label">4.20 m</div>
+
+    <!-- Section cut plane line -->
+    <div class="section-plane-line" id="section-line" style="top:50%"></div>
+
+    <!-- HUD Zone Label -->
+    <div class="hud-zone-label" id="zone-label">ZONE: Building_A › Room_101</div>
+    <!-- Autosave badge -->
+    <div class="hud-save-badge" id="save-indicator">💾  State Saved</div>
+
+    <!-- Debug overlay [trd.md §5.1 WBP_DebugOverlay] -->
+    <div class="hud-debug" id="debug-overlay" style="display:none">
+      <span id="dbg-fps">FPS: 60</span>
+      <span id="dbg-mode">MODE: SHOWCASE</span>
+      <span id="dbg-cam">CAM: ORBIT</span>
+      <span id="dbg-eq">EQ: Mixer_01</span>
+    </div>
+
+    <!-- MINIMAP [trd.md §5.1] -->
+    <div id="minimap" onclick="minimapClick(event)">
+      <div class="mm-grid"></div>
+      <div class="radar-sweep"></div>
+      <div class="mm-dot" id="md-Mixer_01" style="top:32%;left:36%" title="Mixer_01"></div>
+      <div class="mm-dot" id="md-Mixer_02" style="top:32%;left:52%" title="Mixer_02"></div>
+      <div class="mm-dot" id="md-Pump_01" style="top:54%;left:44%" title="Pump_01"></div>
+      <div class="mm-dot" id="md-Vessel_01" style="top:74%;left:72%" title="Vessel_01"></div>
+      <div class="mm-player" id="mm-player"><div class="mm-arrow"></div></div>
+      <div class="mm-floor" id="mm-floor">F1</div>
+    </div>
+
+    <!-- BOTTOM TOOL PALETTE -->
+    <div id="bottombar" class="glass">
+      <div class="bb-group">
+        <!-- Radial menu toggle [trd.md §5.1] -->
+        <button class="tool-btn" onclick="openRadial()" title="Open Tool Wheel">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="12" cy="19" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          <span class="tt">Tool Wheel (Q)</span>
+        </button>
+        <button class="tool-btn" id="btn-xray" onclick="activateTool('xray')">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          <span class="tt">X-Ray [trd.md §3.3]</span>
+        </button>
+        <button class="tool-btn" id="btn-explode" onclick="activateTool('explode')">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span class="tt">Explode View [trd.md §3.3]</span>
+        </button>
+        <button class="tool-btn" id="btn-cropbox" onclick="activateTool('cropbox')">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+          <span class="tt">Section Cut [trd.md §3.3]</span>
+        </button>
+        <button class="tool-btn" id="btn-datasmith" onclick="activateTool('datasmith')">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          <span class="tt">DataSmith [trd.md §3.3]</span>
+        </button>
+      </div>
+
+      <div class="bb-div"></div>
+
+      <div class="bb-group">
+        <button class="tool-btn" id="btn-measure" onclick="activateTool('measure')">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+          <span class="tt">Measurement + Snap [trd.md §3.3]</span>
+        </button>
+        <button class="tool-btn" id="btn-scale" onclick="activateTool('scale')">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          <span class="tt">Ratio Scale [trd.md §3.3]</span>
+        </button>
+        <button class="tool-btn" id="btn-annot" onclick="activateTool('annot')">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <span class="tt">Annotation [trd.md §3.3]</span>
+        </button>
+        <button class="tool-btn" id="btn-bkmk" onclick="activateTool('bkmk')">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+          <span class="tt">Bookmark [trd.md §3.3]</span>
+        </button>
+        <button class="tool-btn" id="btn-snap" onclick="performSnapshot()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span class="tt">Snapshot [trd.md §3.3]</span>
+        </button>
+      </div>
+
+      <div class="bb-div"></div>
+
+      <div class="bb-group">
+        <!-- Minimap toggle -->
+        <button class="tool-btn" id="btn-minimap" onclick="toggleMinimap()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          <span class="tt">2D Minimap</span>
+        </button>
+        <!-- Debug overlay toggle -->
+        <button class="tool-btn" id="btn-debug" onclick="toggleDebug()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span class="tt">Debug Overlay</span>
+        </button>
+      </div>
+
+      <div class="bb-div"></div>
+
+      <span class="meas-readout" id="meas-readout">READY</span>
+      <span class="snap-status" id="snap-status">SNAP: OFF</span>
+    </div>
+
+    <!-- GUIDED TOUR CARD [implementation_plan.md §3.1] -->
+    <div id="tour-card" class="glass">
+      <div class="tour-hdr">
+        <span class="tour-title" id="tour-title-txt">Guided Tour</span>
+        <span class="tour-ct" id="tour-ct">Stop 1 of 4</span>
+      </div>
+      <div class="tour-body" id="tour-body"></div>
+      <div class="tour-prog-bg"><div class="tour-prog-fill" id="tour-prog"></div></div>
+      <div class="tour-controls">
+        <button class="tour-btn" onclick="tourPrev()">‹ Prev</button>
+        <button class="tour-btn primary" id="tour-play-btn" onclick="toggleTourPlay()">⏸ Pause</button>
+        <button class="tour-btn" onclick="tourNext()">Next ›</button>
+        <button class="tour-btn close-btn" onclick="closeTour()">✕ Exit Tour</button>
+      </div>
+    </div>
+
+    <!-- TOAST STACK -->
+    <div id="toast-stack"></div>
+
+    <!-- RATIO SCALE PANEL [trd.md §3.3] -->
+    <div id="scale-panel" class="glass">
+      <div class="panel-hdr" style="border-bottom:1px solid var(--border)">
+        <button class="back-btn" onclick="deactivateTool('scale')">‹ Close</button>
+        <span class="panel-hdr-title">Ratio Scale [trd.md §3.3]</span>
+      </div>
+      <div class="scale-inner">
+        <div class="section-title">Reference Scale Factor</div>
+        <div class="scale-slider-row">
+          <span style="font-size:10px;color:var(--txt-lo)">0.1×</span>
+          <input type="range" min="1" max="100" value="10" oninput="updateScale(this.value)">
+          <span style="font-size:10px;color:var(--txt-lo)">10×</span>
+          <span class="scale-val" id="scale-val">1.0×</span>
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:var(--txt-mid)">Spatial validation: bounds check active</div>
+      </div>
+    </div>
+
+    <!-- ANNOTATION PANEL [trd.md §3.3] -->
+    <div id="annot-panel" class="glass" style="padding:12px">
+      <div class="panel-hdr" style="padding:0 0 10px;border-bottom:1px solid var(--border);margin-bottom:10px">
+        <button class="back-btn" onclick="deactivateTool('annot')">‹ Close</button>
+        <span class="panel-hdr-title">New Annotation</span>
+      </div>
+      <div class="annot-type-row">
+        <button class="annot-type-btn on" id="atyp-design" onclick="setAnnotType(this,'design')">Design</button>
+        <button class="annot-type-btn warn-type" id="atyp-maint" onclick="setAnnotType(this,'maint')">Maintenance</button>
+        <button class="annot-type-btn err-type" id="atyp-safety" onclick="setAnnotType(this,'safety')">Safety</button>
+      </div>
+      <textarea class="annot-input" placeholder="Type your annotation note here…"></textarea>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="seg-btn" style="flex:1" onclick="placeAnnotation()">Place in 3D ↗</button>
+        <button class="seg-btn" onclick="deactivateTool('annot')">Cancel</button>
+      </div>
+      <!-- Filter existing annotations -->
+      <div class="section-title" style="margin-top:12px">All Annotations</div>
+      <div id="annot-list" style="display:flex;flex-direction:column;gap:5px;margin-top:6px">
+        <div class="bkmk-item">
+          <span class="bkmk-cat" style="background:var(--accent-dim);color:var(--accent)">DESIGN</span>
+          <span style="flex:1">Motor access clearance</span>
+          <button class="bkmk-del" onclick="removeAnnot(this)">✕</button>
+        </div>
+        <div class="bkmk-item">
+          <span class="bkmk-cat" style="background:var(--alert-dim);color:var(--alert)">SAFETY</span>
+          <span style="flex:1">Pinch point near shaft</span>
+          <button class="bkmk-del" onclick="removeAnnot(this)">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOOKMARK PANEL [trd.md §3.3] -->
+    <div id="bkmk-panel" class="glass" style="padding:12px">
+      <div class="panel-hdr" style="padding:0 0 10px;border-bottom:1px solid var(--border);margin-bottom:10px">
+        <button class="back-btn" onclick="deactivateTool('bkmk')">‹ Close</button>
+        <span class="panel-hdr-title">Bookmarks</span>
+      </div>
+      <button class="seg-btn" style="width:100%;margin-bottom:10px" onclick="addBookmark()">+ Save Current View</button>
+      <div class="section-title">Saved Views</div>
+      <div id="bkmk-list" style="margin-top:6px">
+        <div class="bkmk-item">
+          <span class="bkmk-cat">TOUR</span>
+          <div style="flex:1"><strong style="font-size:12px">Mixing Hall Overview</strong><div style="font-size:9px;color:var(--txt-lo);font-family:var(--mono)">Mixer_01 · ORBIT · F1</div></div>
+          <button class="bkmk-del" onclick="this.closest('.bkmk-item').remove();toast('Bookmark removed','warn')">✕</button>
+        </div>
+        <div class="bkmk-item">
+          <span class="bkmk-cat">INSPECT</span>
+          <div style="flex:1"><strong style="font-size:12px">Pump Shaft Detail</strong><div style="font-size:9px;color:var(--txt-lo);font-family:var(--mono)">Pump_01 · ORBIT · F1</div></div>
+          <button class="bkmk-del" onclick="this.closest('.bkmk-item').remove();toast('Bookmark removed','warn')">✕</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /viewport -->
+
+  <!-- ── RIGHT DETAILS PANEL ── -->
+  <div id="details" class="glass" style="border-radius:0;border-left:1px solid var(--border)">
+    <!-- Tabs [trd.md §5.1] -->
+    <div class="dtabs">
+      <button class="dtab on" id="dt-overview" onclick="setDTab('overview')">Overview</button>
+      <button class="dtab" id="dt-components" onclick="setDTab('components')">Parts</button>
+      <button class="dtab" id="dt-actions" onclick="setDTab('actions')">Actions</button>
+      <button class="dtab" id="dt-drawings" onclick="setDTab('drawings')">Drawings</button>
+      <button class="dtab" id="dt-telemetry" onclick="setDTab('telemetry')">Telemetry</button>
+    </div>
+
+    <!-- ── OVERVIEW TAB ── -->
+    <div class="dpane on" id="pane-overview">
+      <div>
+        <h2 style="font-size:17px;font-weight:700" id="d-name">Ribbon Mixer #1</h2>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--accent);display:block;margin-top:3px" id="d-tag">TAG: Mixer_01</span>
+      </div>
+      <div class="section-title">Plant 3D Metadata</div>
+      <table class="spec-grid" id="spec-meta">
+        <tr><td class="lbl">P&amp;ID Code</td><td class="val" id="d-pid">M-101</td></tr>
+        <tr><td class="lbl">Process Line</td><td class="val" id="d-line">PL-001</td></tr>
+        <tr><td class="lbl">Manufacturer</td><td class="val" id="d-oem">GEA Group</td></tr>
+        <tr><td class="lbl">Model</td><td class="val" id="d-model">tCut 200</td></tr>
+        <tr><td class="lbl">Match Status</td><td class="val"><span class="badge ok" id="d-match">Tag Matched</span></td></tr>
+      </table>
+      <div class="section-title">Specifications</div>
+      <table class="spec-grid" id="spec-stats"></table>
+    </div>
+
+    <!-- ── COMPONENTS / PARTS TAB ── -->
+    <div class="dpane" id="pane-components">
+      <div class="section-title">Sub-Assembly Checklist</div>
+      <div style="font-size:11px;color:var(--txt-lo);margin-bottom:10px">Check to isolate component in viewport</div>
+      <div id="comp-list" style="display:flex;flex-direction:column;gap:6px"></div>
+
+      <!-- Inspection Walkthrough [prd.md §46] -->
+      <div class="section-title" style="margin-top:16px">Inspection Walkthrough</div>
+      <div id="insp-list" style="display:flex;flex-direction:column;gap:5px"></div>
+    </div>
+
+    <!-- ── ACTIONS TAB [implementation_plan.md §4.1] ── -->
+    <div class="dpane" id="pane-actions">
+      <div class="section-title">Visualization Tools</div>
+      <div class="action-grid" id="action-grid"></div>
+      <div class="section-title" style="margin-top:16px">Navigation</div>
+      <div class="action-grid" id="nav-grid"></div>
+    </div>
+
+    <!-- ── DRAWINGS TAB [prd.md §45] ── -->
+    <div class="dpane" id="pane-drawings">
+      <div class="section-title">AutoCAD GA Sheet Reference</div>
+      <div style="font-size:11px;color:var(--txt-lo);margin-bottom:10px">Drag to pan · Slider to zoom · Double-click to fullscreen</div>
+      <div class="cad-frame" id="cad-frame" onmousedown="cadPanStart(event)">
+        <svg id="cad-svg" viewBox="0 0 200 120" style="width:90%;height:90%;transform:scale(1) translate(0px,0px);transform-origin:center;transition:transform .15s">
+          <rect x="4" y="4" width="192" height="112" fill="none" stroke="#2D5C8F" stroke-width="1.2"/>
+          <rect x="14" y="14" width="172" height="92" fill="none" stroke="#1D3E64" stroke-width=".8" stroke-dasharray="2 1"/>
+          <circle cx="60" cy="60" r="24" fill="none" stroke="#2D5C8F" stroke-width="1.5"/>
+          <line x1="60" y1="14" x2="60" y2="106" stroke="#1D3E64" stroke-width=".5"/>
+          <line x1="14" y1="60" x2="186" y2="60" stroke="#1D3E64" stroke-width=".5"/>
+          <rect x="122" y="44" width="44" height="32" fill="none" stroke="#2D5C8F" stroke-width="1.5"/>
+          <circle cx="144" cy="60" r="9" fill="none" stroke="var(--accent)" stroke-width="1"/>
+          <text x="123" y="39" font-size="5" fill="#4A90D9" font-family="monospace">P&amp;ID REF: PL-001 · GA-102</text>
+          <!-- Dim lines -->
+          <line x1="14" y1="108" x2="186" y2="108" stroke="#4A90D9" stroke-width=".5" stroke-dasharray="1 2"/>
+          <text x="90" y="114" font-size="4" fill="#4A90D9" font-family="monospace" text-anchor="middle">14,200mm</text>
+        </svg>
+      </div>
+      <div class="cad-ctrl">
+        <span style="font-size:10px;color:var(--txt-lo)">Zoom:</span>
+        <input type="range" min="1" max="4" step=".1" value="1" oninput="cadZoom(this.value)">
+        <button onclick="cadReset()">Reset</button>
+      </div>
+    </div>
+
+    <!-- ── TELEMETRY TAB [trd.md §3.2] ── -->
+    <div class="dpane" id="pane-telemetry">
+      <div class="section-title">Live Sensor Feed</div>
+      <div class="sensor-card">
+        <div class="sensor-hdr"><span>AGITATOR RPM</span><span id="sv-rpm">1,450 RPM</span></div>
+        <div class="sparkline" id="sp-rpm"></div>
+      </div>
+      <div class="sensor-card">
+        <div class="sensor-hdr"><span>TEMPERATURE T-102</span><span id="sv-temp" style="color:var(--warn)">42.8 °C</span></div>
+        <div class="sparkline" id="sp-temp"></div>
+      </div>
+      <div class="sensor-card">
+        <div class="sensor-hdr"><span>PRESSURE (BAR)</span><span id="sv-press">1.02 BAR</span></div>
+        <div class="sparkline" id="sp-press"></div>
+      </div>
+    </div>
+  </div><!-- /details -->
+
+</div><!-- /workspace -->
+
+<!-- RADIAL TOOL WHEEL [trd.md §5.1] -->
+<div id="radial-overlay" onclick="closeRadial(event)">
+  <div id="radial-wheel">
+    <div class="rad-center" onclick="closeRadial()">Close<br>ESC</div>
+    <!-- Items positioned by JS -->
+  </div>
+</div>
+
+<!-- SAVE STATE PANEL [trd.md §8] -->
+<div id="save-panel" class="glass" style="padding:14px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <span style="font-size:12px;font-weight:700">Save / Load State</span>
+    <button class="back-btn" onclick="toggleSavePanel()">Close ✕</button>
+  </div>
+  <div id="slot-list">
+    <div class="save-slot">
+      <div class="save-dot used"></div>
+      <div style="flex:1"><strong style="font-size:12px">Slot 1</strong><div style="font-size:10px;color:var(--txt-lo);font-family:var(--mono)">Mixer_01 · Showcase · 14:22</div></div>
+      <div class="slot-acts">
+        <button class="slot-btn" onclick="loadSlot(1)">Load</button>
+        <button class="slot-btn" style="color:var(--alert)" onclick="clearSlot(1,this)">Del</button>
+      </div>
+    </div>
+    <div class="save-slot"><div class="save-dot"></div><span style="flex:1;font-size:12px;color:var(--txt-lo)">Slot 2 — Empty</span><button class="slot-btn" onclick="saveToSlot(2,this)">Save here</button></div>
+    <div class="save-slot"><div class="save-dot"></div><span style="flex:1;font-size:12px;color:var(--txt-lo)">Slot 3 — Empty</span><button class="slot-btn" onclick="saveToSlot(3,this)">Save here</button></div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settings-modal" onclick="closeSettings(event)">
+  <div class="modal-card glass" style="border-radius:12px">
+    <div class="modal-hdr">
+      <h3>Settings &amp; Accessibility</h3>
+      <button class="modal-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="form-grp">
+      <div class="form-label">Text Scale [prd.md §67]</div>
+      <div class="seg-ctrl" id="seg-font">
+        <button class="seg-btn on" onclick="setFontScale(1.0,this)">Standard</button>
+        <button class="seg-btn" onclick="setFontScale(1.18,this)">Medium</button>
+        <button class="seg-btn" onclick="setFontScale(1.36,this)">Large</button>
+      </div>
+    </div>
+    <div class="toggle-row">
+      <div><div class="form-label">High Contrast [prd.md §68]</div><div style="font-size:11px;color:var(--txt-lo)">Stronger panel borders and text</div></div>
+      <div class="tgl" id="tgl-contrast" onclick="toggleContrast()"><div class="tgl-nob"></div></div>
+    </div>
+    <div class="toggle-row">
+      <div><div class="form-label">Shape Indicators [prd.md §69]</div><div style="font-size:11px;color:var(--txt-lo)">Use ■ ▲ ● instead of colour only</div></div>
+      <div class="tgl" id="tgl-shape" onclick="toggleShapeA11y()"><div class="tgl-nob"></div></div>
+    </div>
+    <div class="toggle-row">
+      <div><div class="form-label">Debug Overlay [trd.md §5.1]</div><div style="font-size:11px;color:var(--txt-lo)">FPS, mode, pawn, equipment HUD</div></div>
+      <div class="tgl" id="tgl-debug" onclick="toggleDebug()"><div class="tgl-nob"></div></div>
+    </div>
+    <div class="form-grp">
+      <div class="form-label">Hotkeys [prd.md §70]</div>
+      <div style="font-family:var(--mono);font-size:10px;background:rgba(0,0,0,.3);border-radius:5px;padding:10px;color:var(--txt-mid);line-height:1.7">
+        <strong style="color:#fff">Q</strong> Tool Wheel &nbsp;·&nbsp; <strong style="color:#fff">S</strong> Toggle Snap &nbsp;·&nbsp; <strong style="color:#fff">X</strong> X-Ray<br>
+        <strong style="color:#fff">E</strong> Explode &nbsp;·&nbsp; <strong style="color:#fff">M</strong> Measure &nbsp;·&nbsp; <strong style="color:#fff">Ctrl+F</strong> Search<br>
+        <strong style="color:#fff">TAB</strong> Tab next panel &nbsp;·&nbsp; <strong style="color:#fff">ESC</strong> Close / Back
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════ -->
+<script>
+// ══════════════════════════════════════════════
+// DATA [trd.md §4]
+// ══════════════════════════════════════════════
+const EQ = {
+  Mixer_01:{name:"Ribbon Mixer #1",pid:"M-101",line:"PL-001",oem:"GEA Group",model:"tCut 200",
+    stats:{"Capacity":"500 kg","Max Temp":"80 °C","Speed":"1,450 RPM","Max Load":"620 kg"},
+    comps:[{id:"comp-motor",n:"TEFC Motor 15kW",s:"ok",int:"6 months"},{id:"comp-shaft",n:"Rotary Shaft Coupling",s:"warn",int:"Due in 14 days"},{id:"comp-bowl",n:"Ribbon Impeller Set",s:"ok",int:"12 months"}],
+    steps:["Check motor foundation bolts for cracking","Laser-align shaft — max deviation 0.15mm","Inspect impeller clearance — target 3.5mm"],
+    mmX:"36%",mmY:"32%",heading:45,
+    loc:"Building_A › Room_101",rpm:1450,temp:42.8,press:1.02},
+  Mixer_02:{name:"Fluidized Mixer #2",pid:"M-102",line:"PL-001",oem:"Orion Industries",model:"Fluid-200",
+    stats:{"Airflow":"200 m³/h","Chamber Pressure":"2.42 BAR","Spray rate":"1.2 L/min"},
+    comps:[{id:"comp-motor",n:"Blower Drive Unit",s:"ok",int:"9 months"},{id:"comp-shaft",n:"Spray Nozzle Array",s:"ok",int:"3 months"},{id:"comp-bowl",n:"Fluidizer Dispersion Pad",s:"overdue",int:"⚠ OVERDUE"}],
+    steps:["Check nozzle orifice for calcification","Inspect fluidizer mesh for blockage"],
+    mmX:"52%",mmY:"32%",heading:90,
+    loc:"Building_A › Room_101",rpm:1120,temp:65.4,press:2.42},
+  Pump_01:{name:"Feed Pump #1",pid:"P-101",line:"PL-001",oem:"Grundfos",model:"CR 32-2",
+    stats:{"Flow Rate":"32.0 m³/h","Head":"45.0 m","Speed":"2,900 RPM","Power":"5.5 kW"},
+    comps:[{id:"comp-motor",n:"TEFC Drive Motor 5.5kW",s:"ok",int:"12 months"},{id:"comp-shaft",n:"Mechanical Shaft Seal",s:"warn",int:"Due soon"},{id:"comp-bowl",n:"Centrifugal Impeller",s:"ok",int:"24 months"}],
+    steps:["Confirm zero drip at mechanical seal"],
+    mmX:"44%",mmY:"54%",heading:180,
+    loc:"Building_A › Room_101",rpm:2900,temp:38.2,press:3.1},
+  Vessel_01:{name:"Storage Tank #1",pid:"V-201",line:"PL-002",oem:"Feldmeier",model:"FT-500",
+    stats:{"Volume":"5,000 L","Steam Jacket":"4.5 BAR","Max Density":"1.4 g/cm³"},
+    comps:[{id:"comp-motor",n:"Agitator Gearbox Motor",s:"ok",int:"18 months"},{id:"comp-shaft",n:"Level Pressure Transmitter",s:"ok",int:"6 months"},{id:"comp-bowl",n:"Steam Jacket Regulator",s:"ok",int:"12 months"}],
+    steps:["Verify hydrostatic gauge vs sight glass","Inspect CIP spray ball rotation"],
+    mmX:"72%",mmY:"74%",heading:315,
+    loc:"Building_B › Room_102",rpm:90,temp:19.5,press:0.82}
+};
+
+const TREE = [
+  {id:"Building_A",n:"Main Production Building",type:"building",children:[
+    {id:"Room_101",n:"Mixing Hall",type:"room",children:["Mixer_01","Mixer_02","Pump_01"]}
+  ]},
+  {id:"Building_B",n:"Secondary Storage",type:"building",children:[
+    {id:"Room_102",n:"Holding Room #1",type:"room",children:["Vessel_01"]}
+  ]}
+];
+
+const TOUR_STOPS = [
+  {eq:"Mixer_01",caption:"Ribbon Mixer #1 (M-101) is the primary mixing vessel where raw starch compounds are combined under thermal-regulated cycles at 78°C."},
+  {eq:"Mixer_02",caption:"Fluidized Mixer #2 (M-102) uses high-velocity air streams to fluidize dry materials, allowing precision spray addition of additives."},
+  {eq:"Pump_01",caption:"Feed Pump #1 (P-101) manages volumetric high-pressure transfer of blended slurry downstream at 32 m³/h."},
+  {eq:"Vessel_01",caption:"Storage Tank #1 (V-201) receives fully processed starch mixes. The double steam-jacket maintains product fluidity during holding."}
+];
+
+const RADIAL_TOOLS = [
+  {key:"xray",  label:"X-Ray",    icon:'<path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>'},
+  {key:"explode",label:"Explode",  icon:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>'},
+  {key:"cropbox",label:"CropBox",  icon:'<rect x="3" y="3" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/>'},
+  {key:"measure",label:"Measure",  icon:'<path d="M3 12h18M3 6h18M3 18h18"/>'},
+  {key:"scale",  label:"RatioScale",icon:'<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>'},
+  {key:"annot",  label:"Annotate", icon:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>'},
+  {key:"bkmk",   label:"Bookmark", icon:'<path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>'},
+  {key:"snap",   label:"Snapshot", icon:'<path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/>'},
+  {key:"datasmith",label:"DataSmith",icon:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>'},
+];
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let state = {
+  role:"ADMIN", mode:"SHOWCASE", cam:"ORBIT",
+  eq:"Mixer_01", activeTab:"overview",
+  xray:false, explode:false, cropbox:false, datasmith:false,
+  measure:false, scale:false, annot:false, bkmk:false,
+  minimap:false, debug:false,
+  sidebarOpen:true, detailsOpen:true,
+  snapEnabled:false,
+  tourRunning:false, tourIdx:0, tourTimer:null, tourPaused:false,
+  saveOpen:false,
+  cadScale:1, cadTX:0, cadTY:0,
+};
+let expandedNodes = {Building_A:true,Room_101:true,Building_B:false,Room_102:false};
+
+// ══════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════
+function setLcSeg(groupId, btn) {
+  document.querySelectorAll(`#${groupId} .seg-btn`).forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function bootApp() {
+  const role = document.getElementById('lc-role').value;
+  state.role = role;
+  document.getElementById('tb-role').textContent = role;
+  document.getElementById('launcher').style.opacity = '0';
+  document.getElementById('launcher').style.pointerEvents = 'none';
+  setTimeout(()=>document.getElementById('launcher').style.display='none', 500);
+  document.getElementById('launcher').style.transition = 'opacity .5s ease';
+  if (role === 'VIEWER') {
+    document.getElementById('mp-ops').style.display = 'none';
+    setMode('SHOWCASE');
+  }
+  toast(`Welcome, ${role}. Orion Engine loaded.`, 'ok');
+  selectEq('Mixer_01');
+  startTelemetry();
+  buildRadialWheel();
+}
+
+// ══════════════════════════════════════════════
+// MODE & CAM [trd.md §3.2]
+// ══════════════════════════════════════════════
+function setMode(m) {
+  if (m === 'OPERATIONS' && state.role === 'VIEWER') {
+    toast('ACCESS DENIED: VIEWER role cannot enter Operations mode', 'err'); return;
+  }
+  const old = state.mode;
+  state.mode = m;
+  document.getElementById('mp-showcase').classList.toggle('on', m==='SHOWCASE');
+  document.getElementById('mp-ops').classList.toggle('on', m==='OPERATIONS');
+
+  // Minimap only in Operations [prd.md §11]
+  if (m === 'OPERATIONS') {
+    state.minimap = true;
+    document.getElementById('minimap').style.display = 'block';
+    document.getElementById('btn-minimap').classList.add('active');
+    document.getElementById('dt-telemetry').style.display = 'block';
+  } else {
+    state.minimap = false;
+    document.getElementById('minimap').style.display = 'none';
+    document.getElementById('btn-minimap').classList.remove('active');
+  }
+  if (state.debug) document.getElementById('dbg-mode').textContent = 'MODE: ' + m;
+  toast(`Mode → ${m}`,'ok');
+  if (old !== m) logEvent('ModeTransition', {from:old,to:m});
+}
+
+function setCam(c) {
+  // [prd.md §Pawn Architecture] 3 canonical modes: ORBIT, WALK, FLY + VR toggle
+  // FlyMode IS the aerial/drone camera — no separate BP_DronePawn exists per spec
+  state.cam = c;
+
+  // Clear all cam buttons
+  ['cm-orbit','cm-walk','cm-fly','cm-vr'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('on');
+  });
+
+  const idMap = {ORBIT:'cm-orbit', WALK:'cm-walk', FLY:'cm-fly', VR:'cm-vr'};
+  const btn = document.getElementById(idMap[c]);
+  if (btn) btn.classList.add('on');
+
+  if (state.debug) document.getElementById('dbg-cam').textContent = 'CAM: ' + c;
+
+  // Mode-specific feedback — clearly distinguishing each mode's unique behaviours
+  const camDetails = {
+    ORBIT: '🔵 OrbitMode — arc-pivot around selected target · RMB rotate · Scroll zoom · Collision-aware · Default in SHOWCASE [prd.md §162]',
+    WALK:  '🟢 WalkMode — First-person ground navigation · WASD move · Mouse look · Gravity/collision ON · Default in OPERATIONS [prd.md §163]',
+    FLY:   '🟡 FlyMode (Aerial) — Free-fly, no collision · WASD pan · Q up / E down altitude · Shift fast · Ctrl slow · Can still click equipment [impl_plan §2.4]',
+    VR:    '🟣 VR Mode → BP_VRPawn · PC tethered (SteamVR / Meta Quest Link) · 72fps target · All tools available [prd.md line 164]'
+  };
+  toast(camDetails[c] || c, 'ok');
+
+  // Update viewport grid tilt to hint at the perspective
+  const grid = document.querySelector('.vp-grid');
+  if (grid) {
+    const tilts = {
+      ORBIT: 'perspective(700px) rotateX(62deg) translateY(-160px)',
+      WALK:  'perspective(700px) rotateX(82deg) translateY(-60px)',
+      FLY:   'perspective(700px) rotateX(42deg) translateY(-250px)',
+      VR:    'perspective(600px) rotateX(72deg) translateY(-140px) scale(1.05)'
+    };
+    grid.style.transform = tilts[c] || tilts.ORBIT;
+  }
+
+  // Show VR badge overlay note when VR is picked
+  if (c === 'VR') {
+    toast('VR requires SteamVR / Meta Quest Link connected · 72fps guaranteed [trd.md §11.2]', 'warn');
+  }
+}
+
+// ══════════════════════════════════════════════
+// TREE BROWSER [trd.md §5.3]
+// ══════════════════════════════════════════════
+function buildTree() {
+  const cont = document.getElementById('tree-container');
+  cont.innerHTML = '';
+  let count = 0;
+  TREE.forEach(b => {
+    count++;
+    const br = row(b.n, 0, '🏢', b.id, expandedNodes[b.id], '', ()=>toggleExpand(b.id));
+    cont.appendChild(br);
+    if (!expandedNodes[b.id]) return;
+    b.children.forEach(r => {
+      count++;
+      const rr = row(r.n, 1, '🚪', r.id, expandedNodes[r.id], '', ()=>toggleExpand(r.id));
+      cont.appendChild(rr);
+      if (!expandedNodes[r.id]) return;
+      r.children.forEach(k => {
+        count++;
+        const e = EQ[k];
+        const er = row(e.name, 2, iconFor(k), k, false, e.pid, ()=>selectEq(k));
+        if (k === state.eq) er.classList.add('sel');
+        cont.appendChild(er);
+      });
+    });
+  });
+  document.getElementById('tree-count-badge').textContent = count + ' rows';
+  document.getElementById('tree-footer-txt').textContent = `6,500 items virtual (${count} loaded)`;
+}
+
+function row(name, depth, ico, id, expanded, tag, fn) {
+  const d = document.createElement('div');
+  d.className = 'tree-row' + (depth===1?' tree-indent-1':depth===2?' tree-indent-2':'');
+  d.innerHTML = `<span class="tree-arrow ${depth<2?(expanded?'open':''):'hidden'}">${depth<2?'▶':''}</span>
+    <span style="font-size:14px">${ico}</span>
+    <span style="flex:1">${name}</span>
+    ${tag?`<span class="tree-pill">${tag}</span>`:''}`;
+  d.onclick = e=>{ e.stopPropagation(); fn(); };
+  return d;
+}
+
+function iconFor(k) {
+  if (k.includes('Mixer')) return '🌀';
+  if (k.includes('Pump')) return '⚙️';
+  return '🛢️';
+}
+
+function toggleExpand(id) {
+  expandedNodes[id] = !expandedNodes[id];
+  buildTree();
+}
+
+// ══════════════════════════════════════════════
+// EQUIPMENT SELECTION [trd.md §6.1]
+// ══════════════════════════════════════════════
+function selectEq(k) {
+  state.eq = k;
+  const e = EQ[k];
+  logEvent('EquipmentView',{equipment_id:k});
+
+  // Update breadcrumb [implementation_plan.md §0.3]
+  const loc = e.loc.split(' › ');
+  document.getElementById('bc1').textContent = loc[0] || '';
+  document.getElementById('bc2').textContent = loc[1] || '';
+  document.getElementById('bc3').textContent = e.name;
+  document.getElementById('zone-label').textContent = 'ZONE: ' + e.loc;
+  if (state.debug) document.getElementById('dbg-eq').textContent = 'EQ: ' + k;
+
+  // 3D model rotate sweep
+  const angles = {Mixer_01:'rotateY(30deg)',Mixer_02:'rotateY(115deg)',Pump_01:'rotateY(210deg)',Vessel_01:'rotateY(290deg)'};
+  document.getElementById('machine').style.transform = `perspective(800px) ${angles[k]} rotateX(15deg)`;
+
+  // Minimap player
+  const mm = EQ[k];
+  document.querySelectorAll('.mm-dot').forEach(d=>d.classList.remove('active'));
+  const md = document.getElementById('md-'+k);
+  if (md) {
+    md.classList.add('active');
+    const p = document.getElementById('mm-player');
+    p.style.top = mm.mmY;
+    p.style.left = mm.mmX;
+    p.style.transform = `translate(-50%,-50%) rotate(${mm.heading}deg)`;
+  }
+
+  // Populate details drawer
+  document.getElementById('details').classList.remove('closed');
+  populateDetails(k);
+  buildTree();
+}
+
+function populateDetails(k) {
+  const e = EQ[k];
+  document.getElementById('d-name').textContent = e.name;
+  document.getElementById('d-tag').textContent = 'TAG: ' + k;
+  document.getElementById('d-pid').textContent = e.pid;
+  document.getElementById('d-line').textContent = e.line;
+  document.getElementById('d-oem').textContent = e.oem;
+  document.getElementById('d-model').textContent = e.model;
+
+  // Stats
+  const sg = document.getElementById('spec-stats');
+  sg.innerHTML = Object.entries(e.stats).map(([l,v])=>`<tr><td class="lbl">${l}</td><td class="val">${v}</td></tr>`).join('');
+
+  // Components [prd.md §43]
+  const cl = document.getElementById('comp-list');
+  cl.innerHTML = '';
+  e.comps.forEach(c => {
+    const statusShape = c.s === 'ok' ? '' : c.s === 'warn' ? 'warn' : 'overdue';
+    cl.innerHTML += `<div class="comp-row" onclick="toggleCompVisibility('${c.id}',this)">
+      <input class="comp-chk" type="checkbox" checked onclick="event.stopPropagation();toggleCompVisibility('${c.id}',this.closest('.comp-row'))">
+      <div class="status-shape ${statusShape}"></div>
+      <div style="flex:1"><strong>${c.n}</strong><div style="font-size:10px;color:var(--txt-lo);margin-top:2px">${c.int}</div></div>
+    </div>`;
+  });
+
+  // Inspection steps [prd.md §46]
+  const il = document.getElementById('insp-list');
+  il.innerHTML = '';
+  e.steps.forEach((s,i) => {
+    const el = document.createElement('div');
+    el.style.cssText = 'padding:8px 10px;border-radius:5px;background:rgba(255,255,255,.02);border:1px solid var(--border);cursor:pointer;font-size:11px;transition:all .2s;margin-bottom:4px;display:flex;gap:8px;align-items:flex-start;';
+    el.innerHTML = `<span style="font-family:var(--mono);font-size:9px;background:rgba(255,255,255,.04);padding:1px 5px;border-radius:3px;flex-shrink:0;margin-top:1px">0${i+1}</span><span>${s}</span>`;
+    el.onclick = () => {
+      document.querySelectorAll('#insp-list > div').forEach(r=>r.style.borderColor='var(--border)');
+      el.style.borderColor = 'var(--accent)';
+      el.style.background = 'var(--accent-dim)';
+      el.style.color = 'var(--accent)';
+      highlightComponent(e.comps[i]?.id || 'comp-motor');
+    };
+    il.appendChild(el);
+  });
+
+  // Actions tab [implementation_plan.md §4.1]
+  document.getElementById('action-grid').innerHTML = [
+    {key:'explode', label:'Explode Assembly', sub:'3-level hierarchical split', col:'teal', fn:"activateTool('explode')"},
+    {key:'xray',   label:'Toggle X-Ray',     sub:'Per-equipment selective overlay', col:'teal', fn:"activateTool('xray')"},
+    {key:'cropbox',label:'Section Cut',       sub:'Plane/cube with hatch fill', col:'amber', fn:"activateTool('cropbox')"},
+    {key:'measure',label:'Measure Tool',      sub:'Multi-point + AutoCAD snap', col:'amber', fn:"activateTool('measure')"},
+    {key:'annot',  label:'Add Annotation',    sub:'Safety / Maintenance / Design', col:'amber', fn:"activateTool('annot')"},
+    {key:'snap',   label:'Take Snapshot',     sub:'Save viewport PNG to telemetry log', col:'teal', fn:"performSnapshot()"},
+  ].map(a=>`<div class="action-row" onclick="${a.fn}">
+    <div class="action-icon ${a.col}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${a.col==='teal'?'var(--accent)':a.col==='amber'?'var(--warn)':'var(--alert)'}" stroke-width="2">${RADIAL_TOOLS.find(t=>t.key===a.key)?.icon||''}</svg>
+    </div>
+    <div><div class="action-name">${a.label}</div><span class="action-sub">${a.sub}</span></div>
+    <span class="action-arrow">›</span>
+  </div>`).join('');
+
+  document.getElementById('nav-grid').innerHTML = [
+    {label:'Sweep Camera Here', sub:'Smooth interpolated sweep to '+e.name, fn:`toast('Camera sweeping to ${e.name}','ok')`},
+    {label:'Start Inspection', sub:'Step-by-step walkthrough ('+e.steps.length+' steps)', fn:"setDTab('components')"},
+    {label:'Trace Process Line '+e.line, sub:'Highlight full pipe path in 3D', fn:`toast('Process line ${e.line} traced','ok')`},
+  ].map(a=>`<div class="action-row" onclick="${a.fn}">
+    <div style="flex:1"><div class="action-name">${a.label}</div><span class="action-sub">${a.sub}</span></div>
+    <span class="action-arrow">›</span>
+  </div>`).join('');
+}
+
+function toggleCompVisibility(compId, row) {
+  const chk = row.querySelector('.comp-chk');
+  const comp = document.getElementById(compId);
+  if (comp) comp.classList.toggle('hidden-comp', !chk.checked);
+  logEvent('CompVisToggle',{id:compId,visible:chk.checked});
+}
+
+function highlightComponent(id) {
+  document.querySelectorAll('.layer').forEach(l=>l.style.filter='');
+  const el = document.getElementById(id);
+  if (el) el.style.filter = 'drop-shadow(0 0 20px var(--accent)) brightness(1.4)';
+  setTimeout(()=>{ if(el) el.style.filter=''; }, 2000);
+}
+
+// ══════════════════════════════════════════════
+// BREADCRUMB BACK NAV [implementation_plan.md §0.3]
+// ══════════════════════════════════════════════
+function bcNav(level) {
+  if (level === 0) {
+    // Go back to plant level — collapse all, show tree at root
+    Object.keys(expandedNodes).forEach(k=>expandedNodes[k]=false);
+    buildTree();
+    document.getElementById('details').classList.add('closed');
+    toast('Navigated to Plant root', 'ok');
+  } else if (level === 1) {
+    // Collapse rooms & equipment, show building level
+    Object.keys(expandedNodes).filter(k=>k.startsWith('Room')).forEach(k=>expandedNodes[k]=false);
+    buildTree();
+  } else if (level === 2) {
+    // Current room — just scroll into view
+    buildTree();
+  }
+}
+
+// Panel-level back [prd.md §7] — goes back from details to tree
+function panelGoBack() {
+  document.getElementById('details').classList.add('closed');
+  document.getElementById('panel-back').style.display = 'none';
+  document.getElementById('panel-title').textContent = 'Plant Hierarchy';
+}
+
+// ══════════════════════════════════════════════
+// SEARCH [trd.md §3.2]
+// ══════════════════════════════════════════════
+function doSearch(q) {
+  const clear = document.getElementById('search-clear');
+  const results = document.getElementById('search-results');
+  if (!q.trim()) { results.innerHTML=''; clear.style.display='none'; return; }
+  clear.style.display = 'block';
+
+  const hits = Object.entries(EQ).filter(([k,e])=>
+    e.name.toLowerCase().includes(q.toLowerCase()) ||
+    k.toLowerCase().includes(q.toLowerCase()) ||
+    e.pid.toLowerCase().includes(q.toLowerCase()) ||
+    e.line.toLowerCase().includes(q.toLowerCase())
+  );
+
+  results.innerHTML = hits.length
+    ? hits.map(([k,e])=>`<div class="sr-item" onclick="selectEq('${k}');clearSearch()">
+        <div><strong>${e.name}</strong><div style="font-size:10px;color:var(--txt-lo);margin-top:2px">TAG: ${k} · ${e.pid} · ${e.line}</div></div>
+        <span class="sr-cat">Equipment</span>
+      </div>`).join('')
+    : '<div style="padding:12px;text-align:center;font-size:12px;color:var(--txt-lo)">No results — try fuzzy terms</div>';
+}
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-results').innerHTML = '';
+  document.getElementById('search-clear').style.display = 'none';
+}
+
+// ══════════════════════════════════════════════
+// TOOL SYSTEM [trd.md §3.3]
+// ══════════════════════════════════════════════
+function activateTool(t) {
+  // Toggle logic — clicking active tool deactivates it (back action)
+  const btn = document.getElementById('btn-' + t);
+
+  if (t === 'xray') {
+    state.xray = !state.xray;
+    btn.classList.toggle('active', state.xray);
+    document.getElementById('machine').classList.toggle('xray', state.xray);
+    toast(state.xray ? 'X-Ray ACTIVE — emissive wireframe overlay' : 'X-Ray OFF', state.xray?'ok':'warn');
+    logEvent('ToolAction',{tool:'BP_OrionXray',state:state.xray});
+
+  } else if (t === 'explode') {
+    state.explode = !state.explode;
+    btn.classList.toggle('active', state.explode);
+    const m = document.getElementById('machine');
+    m.classList.remove('expl-1','expl-2','expl-3');
+    if (state.explode) m.classList.add('expl-2');
+    ['lbl-motor','lbl-shaft','lbl-bowl'].forEach(id=>document.getElementById(id).style.display=state.explode?'block':'none');
+    toast(state.explode ? 'Exploded (Level 2) — click again to cycle off' : 'Explode OFF', state.explode?'ok':'warn');
+    logEvent('ToolAction',{tool:'BP_OrionExplode',state:state.explode});
+
+  } else if (t === 'cropbox') {
+    state.cropbox = !state.cropbox;
+    btn.classList.toggle('active', state.cropbox);
+    document.getElementById('comp-slice').style.display = state.cropbox ? 'flex' : 'none';
+    document.getElementById('section-line').style.display = state.cropbox ? 'block' : 'none';
+    document.getElementById('comp-shaft').classList.toggle('hidden-comp', state.cropbox);
+    toast(state.cropbox ? 'Section Cut ACTIVE — engineering hatch on cut faces' : 'CropBox OFF', state.cropbox?'ok':'warn');
+    logEvent('ToolAction',{tool:'BP_OrionCropBox',state:state.cropbox});
+
+  } else if (t === 'datasmith') {
+    state.datasmith = !state.datasmith;
+    btn.classList.toggle('active', state.datasmith);
+    toast(state.datasmith ? 'DataSmith Sync ACTIVE — Auto-tagging runtime geometry' : 'DataSmith Sync OFF', state.datasmith?'ok':'warn');
+    logEvent('ToolAction',{tool:'BP_OrionDataSmith',state:state.datasmith});
+
+  } else if (t === 'measure') {
+    state.measure = !state.measure;
+    btn.classList.toggle('active', state.measure);
+    state.snapEnabled = state.measure;
+    document.getElementById('snap-status').textContent = state.measure ? 'SNAP: ON' : 'SNAP: OFF';
+    document.getElementById('meas-readout').textContent = state.measure ? 'Click 2 points in viewport…' : 'READY';
+    if (!state.measure) clearMeasure();
+    else setTimeout(simulateMeasure, 1200);
+    toast(state.measure ? 'Measure tool ACTIVE — AutoCAD vertex snapping ON' : 'Measure OFF', state.measure?'ok':'warn');
+    logEvent('ToolAction',{tool:'BP_OrionMeasurement',state:state.measure});
+
+  } else if (t === 'scale') {
+    state.scale = !state.scale;
+    btn.classList.toggle('active', state.scale);
+    document.getElementById('scale-panel').style.display = state.scale ? 'block' : 'none';
+    toast(state.scale ? 'Ratio Scale panel open' : 'Ratio Scale closed', 'ok');
+    logEvent('ToolAction',{tool:'BP_OrionRatioScale',state:state.scale});
+
+  } else if (t === 'annot') {
+    state.annot = !state.annot;
+    btn.classList.toggle('active', state.annot);
+    document.getElementById('annot-panel').style.display = state.annot ? 'block' : 'none';
+    if (state.annot) document.getElementById('annot-badge').style.display = 'block';
+    toast(state.annot ? 'Annotation panel open — click in 3D to place' : 'Annotation closed', 'ok');
+    logEvent('ToolAction',{tool:'BP_OrionAnnotation',state:state.annot});
+
+  } else if (t === 'bkmk') {
+    state.bkmk = !state.bkmk;
+    btn.classList.toggle('active', state.bkmk);
+    document.getElementById('bkmk-panel').style.display = state.bkmk ? 'block' : 'none';
+    if (state.bkmk) document.getElementById('bkmk-badge').style.display = 'block';
+    toast(state.bkmk ? 'Bookmarks panel open' : 'Bookmarks closed', 'ok');
+    logEvent('ToolAction',{tool:'BP_OrionBookmark',state:state.bkmk});
+  }
+  closeRadialSilent();
+}
+
+function deactivateTool(t) {
+  state[t] = false;
+  const btn = document.getElementById('btn-'+t);
+  if (btn) btn.classList.remove('active');
+  if (t==='scale') document.getElementById('scale-panel').style.display='none';
+  if (t==='annot') document.getElementById('annot-panel').style.display='none';
+  if (t==='bkmk') document.getElementById('bkmk-panel').style.display='none';
+}
+
+// Measure simulation [trd.md §3.4]
+function simulateMeasure() {
+  if (!state.measure) return;
+  const p1x=480,p1y=210,p2x=480,p2y=400;
+  document.getElementById('meas-p1').setAttribute('cx',p1x);document.getElementById('meas-p1').setAttribute('cy',p1y);document.getElementById('meas-p1').style.display='block';
+  setTimeout(()=>{
+    if(!state.measure) return;
+    document.getElementById('meas-p2').setAttribute('cx',p2x);document.getElementById('meas-p2').setAttribute('cy',p2y);document.getElementById('meas-p2').style.display='block';
+    document.getElementById('meas-ring').setAttribute('cx',p2x);document.getElementById('meas-ring').setAttribute('cy',p2y);document.getElementById('meas-ring').style.display='block';
+    document.getElementById('meas-poly').setAttribute('points',`${p1x},${p1y} ${p2x},${p2y}`);document.getElementById('meas-poly').style.display='block';
+    const lbl=document.getElementById('meas-label');
+    lbl.style.top=(p1y+p2y)/2-10+'px';lbl.style.left=(p1x+p2x)/2+12+'px';
+    lbl.style.display='block';lbl.textContent='4.20 m (Vertex snap ◈)';
+    document.getElementById('meas-readout').textContent='DIST: 4.20 m | SNAP: VERTEX';
+    logEvent('MeasurementComplete',{dist_m:4.20,snap:'vertex'});
+  },1000);
+}
+
+function clearMeasure() {
+  ['meas-p1','meas-p2','meas-ring','meas-poly'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('meas-label').style.display='none';
+  document.getElementById('meas-readout').textContent='READY';
+}
+
+// Snapshot [trd.md §3.3]
+function performSnapshot() {
+  const f=document.getElementById('snap-flash');
+  f.classList.add('go');
+  setTimeout(()=>f.classList.remove('go'),800);
+  toast('Snapshot saved → Saved/Logs/Telemetry/Snapshots/','ok');
+  logEvent('SnapshotCapture',{file:'Snap_'+Date.now()+'.png'});
+}
+
+// Annotation place/remove
+function placeAnnotation() {
+  document.getElementById('annot-badge').style.display='block';
+  toast('Annotation placed in 3D scene','ok');
+  logEvent('AnnotationPlaced',{type:'design',equipment:state.eq});
+}
+function removeAnnot(btn) {
+  btn.closest('.bkmk-item').remove();
+  toast('Annotation removed','warn');
+}
+function setAnnotType(btn, t) {
+  document.querySelectorAll('.annot-type-btn').forEach(b=>{b.classList.remove('on','warn-type','err-type');});
+  btn.classList.add('on');
+  if (t==='maint') btn.classList.add('warn-type');
+  if (t==='safety') btn.classList.add('err-type');
+}
+
+// Bookmark add
+function addBookmark() {
+  const item=document.createElement('div');
+  item.className='bkmk-item';
+  item.innerHTML=`<span class="bkmk-cat">CUSTOM</span>
+    <div style="flex:1"><strong style="font-size:12px">${EQ[state.eq].name} View</strong>
+    <div style="font-size:9px;color:var(--txt-lo);font-family:var(--mono)">${state.eq} · ${state.cam} · F1</div></div>
+    <button class="bkmk-del" onclick="this.closest('.bkmk-item').remove();toast('Bookmark removed','warn')">✕</button>`;
+  document.getElementById('bkmk-list').prepend(item);
+  toast('Bookmark saved — '+ EQ[state.eq].name,'ok');
+  logEvent('BookmarkAdded',{eq:state.eq,cam:state.cam});
+}
+
+// Ratio Scale update
+function updateScale(v) {
+  const scale = (v/10).toFixed(1);
+  document.getElementById('scale-val').textContent = scale + '×';
+  logEvent('ScaleAdjusted',{factor:scale});
+}
+
+// ══════════════════════════════════════════════
+// RADIAL WHEEL [trd.md §5.1]
+// ══════════════════════════════════════════════
+function buildRadialWheel() {
+  const wheel = document.getElementById('radial-wheel');
+  const r = 108;
+  RADIAL_TOOLS.forEach((t,i) => {
+    const angle = (i/RADIAL_TOOLS.length)*2*Math.PI - Math.PI/2;
+    const x = 140 + r*Math.cos(angle);
+    const y = 140 + r*Math.sin(angle);
+    const el = document.createElement('div');
+    el.className = 'rad-item';
+    el.style.cssText = `position:absolute;left:${x}px;top:${y}px;transform:translate(-50%,-50%)`;
+    el.innerHTML = `<div class="rad-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--txt-mid)" stroke-width="2">${t.icon}</svg></div><div class="rad-label">${t.label}</div>`;
+    el.onclick = e => { e.stopPropagation(); activateTool(t.key); closeRadialSilent(); };
+    wheel.appendChild(el);
+  });
+}
+
+function openRadial() {
+  const ov = document.getElementById('radial-overlay');
+  ov.style.display = 'flex';
+  setTimeout(()=>ov.style.opacity='1',10);
+  ov.style.transition = 'opacity .25s ease';
+}
+
+function closeRadial(e) {
+  if (e && e.target !== document.getElementById('radial-overlay')) return;
+  closeRadialSilent();
+}
+function closeRadialSilent() {
+  const ov = document.getElementById('radial-overlay');
+  ov.style.opacity='0';
+  setTimeout(()=>ov.style.display='none',250);
+}
+
+// ══════════════════════════════════════════════
+// GUIDED TOUR [implementation_plan.md §3.1]
+// ══════════════════════════════════════════════
+function startTour() {
+  if (state.tourRunning) { closeTour(); return; }
+  state.tourRunning = true;
+  state.tourIdx = 0;
+  state.tourPaused = false;
+  document.getElementById('tour-card').style.display = 'block';
+  runTourStep();
+  logEvent('TourStart',{tour:'Investor_Walkthrough'});
+}
+
+function runTourStep() {
+  if (!state.tourRunning) return;
+  const s = TOUR_STOPS[state.tourIdx];
+  selectEq(s.eq);
+  document.getElementById('tour-title-txt').textContent = '🌀 ' + EQ[s.eq].name;
+  document.getElementById('tour-ct').textContent = `Stop ${state.tourIdx+1} of ${TOUR_STOPS.length}`;
+  document.getElementById('tour-body').textContent = s.caption;
+  animateTourProgress();
+}
+
+function animateTourProgress() {
+  clearInterval(state.tourTimer);
+  let prog = 0;
+  document.getElementById('tour-prog').style.width = '0%';
+  if (state.tourPaused) return;
+  state.tourTimer = setInterval(()=>{
+    if (state.tourPaused) return;
+    prog += 2;
+    document.getElementById('tour-prog').style.width = prog + '%';
+    if (prog >= 100) { clearInterval(state.tourTimer); tourNext(); }
+  }, 100);
+}
+
+function tourNext() {
+  state.tourIdx = (state.tourIdx+1) % TOUR_STOPS.length;
+  if (state.tourIdx === 0) { closeTour(); toast('Tour completed!','ok'); logEvent('TourCompletion',{completion_percent:100}); return; }
+  runTourStep();
+}
+
+function tourPrev() {
+  state.tourIdx = Math.max(0, state.tourIdx-1);
+  runTourStep();
+}
+
+function toggleTourPlay() {
+  state.tourPaused = !state.tourPaused;
+  document.getElementById('tour-play-btn').textContent = state.tourPaused ? '▶ Resume' : '⏸ Pause';
+  if (!state.tourPaused) animateTourProgress();
+  else clearInterval(state.tourTimer);
+}
+
+function closeTour() {
+  clearInterval(state.tourTimer);
+  state.tourRunning = false;
+  document.getElementById('tour-card').style.display = 'none';
+  toast('Tour exited', 'warn');
+}
+
+// ══════════════════════════════════════════════
+// MINIMAP [trd.md §5.1, §3.4]
+// ══════════════════════════════════════════════
+function toggleMinimap() {
+  state.minimap = !state.minimap;
+  document.getElementById('minimap').style.display = state.minimap ? 'block' : 'none';
+  document.getElementById('btn-minimap').classList.toggle('active', state.minimap);
+}
+
+function minimapClick(e) {
+  if (state.mode === 'SHOWCASE') { toast('Minimap teleport locked in Showcase mode','warn'); return; }
+  const rect = document.getElementById('minimap').getBoundingClientRect();
+  const u = (e.clientX - rect.left) / rect.width;
+  const v = (e.clientY - rect.top) / rect.height;
+  const wx = Math.round(-2000 + u*8000), wy = Math.round(2000 - v*6000);
+  const p = document.getElementById('mm-player');
+  p.style.left = (u*100)+'%';
+  p.style.top = (v*100)+'%';
+  p.style.transform = `translate(-50%,-50%) rotate(${Math.floor(Math.random()*360)}deg)`;
+  toast(`Teleported → X:${wx} Y:${wy}`,'ok');
+  logEvent('MinimapTeleport',{uv:[u.toFixed(3),v.toFixed(3)],world:[wx,wy,150]});
+}
+
+// ══════════════════════════════════════════════
+// DETAILS TAB SWITCH
+// ══════════════════════════════════════════════
+function setDTab(t) {
+  state.activeTab = t;
+  document.querySelectorAll('.dtab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.dpane').forEach(p=>p.classList.remove('on'));
+  document.getElementById('dt-'+t).classList.add('on');
+  document.getElementById('pane-'+t).classList.add('on');
+}
+
+// ══════════════════════════════════════════════
+// SAVE STATE [trd.md §8]
+// ══════════════════════════════════════════════
+function toggleSavePanel() {
+  state.saveOpen = !state.saveOpen;
+  document.getElementById('save-panel').style.display = state.saveOpen ? 'block' : 'none';
+  document.getElementById('btn-save').classList.toggle('active', state.saveOpen);
+}
+
+function saveToSlot(n, btn) {
+  const slot = btn.closest('.save-slot');
+  slot.querySelector('.save-dot').classList.add('used');
+  slot.innerHTML = `<div class="save-dot used"></div>
+    <div style="flex:1"><strong style="font-size:12px">Slot ${n}</strong>
+    <div style="font-size:10px;color:var(--txt-lo);font-family:var(--mono)">${state.eq} · ${state.mode} · ${new Date().toTimeString().slice(0,5)}</div></div>
+    <div class="slot-acts"><button class="slot-btn" onclick="loadSlot(${n})">Load</button>
+    <button class="slot-btn" style="color:var(--alert)" onclick="clearSlot(${n},this)">Del</button></div>`;
+  document.getElementById('save-indicator').style.display = 'block';
+  setTimeout(()=>document.getElementById('save-indicator').style.display='none', 2000);
+  toast(`State saved to Slot ${n}`,'ok');
+  logEvent('StateSaved',{slot:n,eq:state.eq,mode:state.mode});
+}
+
+function loadSlot(n) {
+  toast(`State loaded from Slot ${n}`,'ok');
+  logEvent('StateLoaded',{slot:n});
+}
+
+function clearSlot(n, btn) {
+  const slot = btn.closest('.save-slot');
+  slot.querySelector('.save-dot').classList.remove('used');
+  slot.innerHTML = `<div class="save-dot"></div><span style="flex:1;font-size:12px;color:var(--txt-lo)">Slot ${n} — Empty</span><button class="slot-btn" onclick="saveToSlot(${n},this)">Save here</button>`;
+  toast(`Slot ${n} cleared`,'warn');
+}
+
+// ══════════════════════════════════════════════
+// SIDEBAR TOGGLE
+// ══════════════════════════════════════════════
+function toggleSidebar() {
+  state.sidebarOpen = !state.sidebarOpen;
+  document.getElementById('sidepanel').classList.toggle('hidden', !state.sidebarOpen);
+  document.getElementById('btn-sidebar').classList.toggle('active', !state.sidebarOpen);
+}
+
+// ══════════════════════════════════════════════
+// SETTINGS & ACCESSIBILITY [prd.md §67-70]
+// ══════════════════════════════════════════════
+function openSettings() {
+  document.getElementById('settings-modal').style.display = 'flex';
+}
+function closeSettings(e) {
+  if (e && e.target !== document.getElementById('settings-modal')) return;
+  document.getElementById('settings-modal').style.display = 'none';
+}
+function setFontScale(s, btn) {
+  document.documentElement.style.fontSize = (s*14)+'px';
+  document.querySelectorAll('#seg-font .seg-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function toggleContrast() {
+  const t = document.getElementById('tgl-contrast');
+  t.classList.toggle('on');
+  document.body.classList.toggle('high-contrast');
+  if (document.getElementById('tgl-debug').classList.contains('on') === false) {}
+}
+function toggleShapeA11y() {
+  document.getElementById('tgl-shape').classList.toggle('on');
+  toast('Shape-based status indicators toggled','ok');
+}
+function toggleDebug() {
+  state.debug = !state.debug;
+  document.getElementById('debug-overlay').style.display = state.debug ? 'flex' : 'none';
+  document.getElementById('btn-debug').classList.toggle('active', state.debug);
+  const t = document.getElementById('tgl-debug');
+  if (t) t.classList.toggle('on', state.debug);
+}
+
+// High contrast body class
+document.head.insertAdjacentHTML('beforeend',`<style>
+body.high-contrast{--bg-panel:rgba(0,0,0,.96);--border:rgba(255,255,255,.4);--border-glow:var(--accent);--txt-mid:rgba(255,255,255,.85);--txt-lo:rgba(255,255,255,.6)}
+</style>`);
+
+// ══════════════════════════════════════════════
+// CAD PAN/ZOOM [prd.md §45]
+// ══════════════════════════════════════════════
+let cadPanning=false,cadSX=0,cadSY=0;
+function cadPanStart(e) {
+  cadPanning=true; cadSX=e.clientX-state.cadTX; cadSY=e.clientY-state.cadTY;
+  document.addEventListener('mousemove',cadPanMove);
+  document.addEventListener('mouseup',cadPanEnd);
+}
+function cadPanMove(e) {
+  if(!cadPanning) return;
+  state.cadTX=e.clientX-cadSX; state.cadTY=e.clientY-cadSY;
+  updateCadTransform();
+}
+function cadPanEnd() { cadPanning=false; document.removeEventListener('mousemove',cadPanMove); document.removeEventListener('mouseup',cadPanEnd); }
+function cadZoom(v) { state.cadScale=v; updateCadTransform(); }
+function cadReset() { state.cadScale=1;state.cadTX=0;state.cadTY=0; document.querySelector('#pane-drawings input[type=range]').value=1; updateCadTransform(); }
+function updateCadTransform() {
+  document.getElementById('cad-svg').style.transform=`scale(${state.cadScale}) translate(${state.cadTX/state.cadScale}px,${state.cadTY/state.cadScale}px)`;
+}
+
+// ══════════════════════════════════════════════
+// TOAST [trd.md §5.1 WBP_Notification]
+// ══════════════════════════════════════════════
+function toast(msg, type='ok') {
+  const s = document.getElementById('toast-stack');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  const icons = {ok:'✅',warn:'⚠️',err:'❌'};
+  t.innerHTML = `<span>${icons[type]||''}</span><span>${msg}</span>`;
+  s.appendChild(t);
+  setTimeout(()=>t.style.opacity='0',2800);
+  setTimeout(()=>t.remove(),3200);
+  logEvent('Notification',{msg,type});
+}
+
+// ══════════════════════════════════════════════
+// TELEMETRY SIMULATION [trd.md §3.2]
+// ══════════════════════════════════════════════
+function startTelemetry() {
+  setInterval(()=>{
+    const e = EQ[state.eq];
+    const rpmDelta = Math.floor(Math.random()*40-20);
+    const rpmVal = e.rpm + rpmDelta;
+    document.getElementById('sv-rpm').textContent = rpmVal.toLocaleString()+' RPM';
+
+    const tempDelta = (Math.random()*.6-.3).toFixed(1);
+    const tempVal = (e.temp + parseFloat(tempDelta)).toFixed(1);
+    const sv2 = document.getElementById('sv-temp');
+    sv2.textContent = tempVal + ' °C';
+    sv2.style.color = tempVal > 60 ? 'var(--alert)' : tempVal > 40 ? 'var(--warn)' : 'var(--accent)';
+
+    const pressDelta = (Math.random()*.05-.025).toFixed(3);
+    document.getElementById('sv-press').textContent = (e.press + parseFloat(pressDelta)).toFixed(2) + ' BAR';
+
+    updateSparkline('sp-rpm', e.rpm > 2000 ? 80 : e.rpm > 1000 ? 55 : 15);
+    updateSparkline('sp-temp', tempVal > 60 ? 85 : tempVal > 40 ? 50 : 25);
+    updateSparkline('sp-press', e.press > 2 ? 75 : e.press > 1 ? 40 : 20);
+
+    // Rotate impeller blade
+    const b = document.getElementById('blade-svg');
+    if (b) b.setAttribute('transform',`rotate(${(Date.now()/4)%360} 100 154)`);
+  }, 900);
+}
+
+function updateSparkline(id, base) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = '';
+  for (let i=0;i<28;i++) {
+    const bar = document.createElement('div');
+    bar.className = 'spark-bar';
+    bar.style.height = Math.max(8,Math.min(100, base + Math.random()*22-11)) + '%';
+    el.appendChild(bar);
+  }
+}
+
+// ══════════════════════════════════════════════
+// KEYBOARD SHORTCUTS [prd.md §70]
+// ══════════════════════════════════════════════
+window.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  const k = e.key.toUpperCase();
+  if (k === 'Q') { e.preventDefault(); openRadial(); }
+  if (k === 'X') activateTool('xray');
+  if (k === 'E') activateTool('explode');
+  if (k === 'M') activateTool('measure');
+  if (k === 'S') { state.snapEnabled=!state.snapEnabled; document.getElementById('snap-status').textContent='SNAP: '+(state.snapEnabled?'ON':'OFF'); toast('Snap '+(state.snapEnabled?'ON':'OFF'),'ok'); }
+  if (k === 'ESCAPE') { closeRadialSilent(); closeSettings(); toggleSavePanel() && null; }
+  if (e.ctrlKey && k === 'F') { e.preventDefault(); document.getElementById('search-input').focus(); }
+});
+
+// ══════════════════════════════════════════════
+// TELEMETRY LOG (silent)
+// ══════════════════════════════════════════════
+function logEvent(ev, data) {
+  // In production this writes to Saved/Logs/Telemetry/*.json [trd.md §3.2]
+  // console.log(`[${new Date().toTimeString().slice(0,8)}]`, ev, data);
+}
+
+// ══════════════════════════════════════════════
+// LAUNCHER HELPER
+// ══════════════════════════════════════════════
+function setLcSeg(groupId, btn) {
+  document.querySelectorAll(`#${groupId} .seg-btn`).forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// ══════════════════════════════════════════════
+// INIT (boot the launcher mock auto for demo)
+// ══════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  buildTree();
+  buildRadialWheel();
+  // Show config error banner demo
+  // document.getElementById('config-err').style.display = 'flex';
+});
+</script>
+</body>
+</html>

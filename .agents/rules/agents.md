@@ -22,6 +22,7 @@ You MUST enforce the phase gate order: Phase 0 → 1 → 2 → 3 (A/B/C parallel
 exception.
 
 **Governing documents** (always in context):
+
 - `prd.md` — user stories, acceptance criteria, out-of-scope items
 - `trd.md` — module APIs, class names, enums, lifecycle contracts, performance
 - `backend_schema.md` — C++ structs, enum values, Data Table schemas, JSON
@@ -49,6 +50,7 @@ that governs it.
 
 **Constraint**: You must be called by @lead before @blueprint-engineer or
 @cpp-engineer writes a single node or line. You block anything that:
+
 - Uses a class/method name not found verbatim in trd.md or CLAUDE.md Section 13
 - Extends CVT by modification instead of subclassing/delegates
 - Touches open questions Q1–Q5 without flagging them
@@ -206,3 +208,18 @@ Load skill: `.agents/skills/orion-session-log-template.md`
 
 ---
 
+---
+
+## 🔗 Correlation Map
+- **Dashboard:** [Home](../../Home.md)
+- **Governing Specifications:** [PRD](../../GoverningDocuments/prd.md) · [TRD](../../GoverningDocuments/trd.md)
+- **Implementation & Tasks:** [Plan](../../.notes/decisions/implementation_plan.md) · [Tasks](../../.notes/logs/task.md) · [Walkthrough](../../.notes/logs/walkthrough.md) · [Session Log](../../.notes/logs/session_log.md)
+- **Active Agent System:** [Rules](agents.md)
+
+
+---
+## 🔗 Correlation Map
+- **Dashboard:** [Home](../../Home.md)
+- **Governing Specifications:** [PRD](../../GoverningDocuments/prd.md) · [TRD](../../GoverningDocuments/trd.md)
+- **Implementation & Tasks:** [Plan](../../.notes/decisions/implementation_plan.md) · [Tasks](../../.notes/logs/task.md) · [Walkthrough](../../.notes/logs/walkthrough.md) · [Session Log](../../.notes/logs/session_log.md)
+- **Active Agent System:** [Rules](agents.md)

@@ -1,0 +1,15 @@
+==================================================
+       WBP_ORIONROOT INSTANTIATION DIAGNOSTICS      
+==================================================
+SUCCESS: Loaded WBP_OrionRoot class.
+Tried EditorLevelLibrary.get_editor_world(): <Object '/Game/ArchVis/SampleScene/SampleLevel.SampleLevel' (0x000001AEA4250E00) Class 'World'>
+SUCCESS: Got editor world context: SampleLevel
+Attempting to create widget...
+EXCEPTION OCCURRED: module 'unreal' has no attribute 'WidgetBlueprintLibrary'
+Traceback:
+Traceback (most recent call last):
+  File "c:\Users/SHO/Documents/Unreal Projects/OrionCollab/scratch\test_widget_instantiation.py", line 45, in test_instantiation
+    widget_instance = unreal.WidgetBlueprintLibrary.create(world, widget_class, None)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'unreal' has no attribute 'WidgetBlueprintLibrary'
+

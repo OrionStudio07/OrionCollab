@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orion Studios — UI/UX Interactive Platform Demo</title>
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-base: #060B13;
+            --bg-panel: rgba(10, 22, 40, 0.7);
+            --bg-panel-dark: rgba(6, 11, 19, 0.85);
+            --border-panel: rgba(0, 212, 170, 0.15);
+            --border-glow: rgba(0, 212, 170, 0.35);
+            --color-primary: #00D4AA; /* Teal Accent */
+            --color-warning: #FFB74D; /* Amber Caution */
+            --color-alert: #FF5252; /* Red Alert */
+            --text-primary: rgba(255, 255, 255, 0.95);
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --font-main: 'Outfit', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+            --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(10, 40, 80, 0.25) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 80, 70, 0.2) 0%, transparent 40%),
+                linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        /* Glassmorphic Panel Base Styles */
+        .glass-panel {
+            background: var(--bg-panel);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-panel);
+            border-radius: 8px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            transition: var(--transition-smooth);
+        }
+
+        .glass-panel:hover {
+            border-color: var(--border-glow);
+            box-shadow: 0 8px 32px 0 rgba(0, 212, 170, 0.1);
+        }
+
+        /* TOP BAR */
+        header {
+            height: 64px;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-panel);
+            background: rgba(6, 11, 19, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 10;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, var(--color-primary), #00A68A);
+            color: #060B13;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            letter-spacing: 1px;
+            font-size: 14px;
+            box-shadow: 0 0 15px rgba(0, 212, 170, 0.4);
+        }
+
+        .logo-title h1 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-title span {
+            font-size: 11px;
+            color: var(--text-secondary);
+            display: block;
+        }
+
+        .mode-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 4px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 6px 16px;
+            font-family: var(--font-main);
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .mode-btn.active {
+            background: var(--color-primary);
+            color: #060B13;
+            font-weight: 600;
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.3);
+        }
+
+        .session-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .role-selector {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+
+        .role-selector label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .role-selector select {
+            background: transparent;
+            color: var(--color-primary);
+            border: none;
+            outline: none;
+            font-family: var(--font-main);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .role-selector select option {
+            background: var(--bg-base);
+            color: var(--text-primary);
+        }
+
+        /* MAIN CONTAINER */
+        .workspace {
+            flex: 1;
+            display: flex;
+            position: relative;
+            padding: 16px;
+            gap: 16px;
+            height: calc(100vh - 64px);
+        }
+
+        /* SIDEBAR (Left) */
+        .sidebar {
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100%;
+            z-index: 5;
+        }
+
+        .search-container {
+            padding: 12px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px;
+            padding: 8px 12px;
+            gap: 8px;
+            transition: var(--transition-smooth);
+        }
+
+        .search-box:focus-within {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.15);
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            font-size: 13px;
+            flex: 1;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .tree-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 16px 8px;
+        }
+
+        .panel-header {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            padding-left: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge-count {
+            background: rgba(255,255,255,0.05);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            color: var(--color-primary);
+        }
+
+        /* Virtualized List Simulation */
+        .tree-view {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .tree-node {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            font-size: 13px;
+            font-weight: 400;
+            gap: 8px;
+        }
+
+        .tree-node:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .tree-node.selected {
+            background: rgba(0, 212, 170, 0.12);
+            color: var(--color-primary);
+            font-weight: 500;
+            border-left: 3px solid var(--color-primary);
+            padding-left: 5px;
+        }
+
+        .node-indent-1 { margin-left: 16px; }
+        .node-indent-2 { margin-left: 32px; }
+        .node-indent-3 { margin-left: 48px; }
+
+        .node-arrow {
+            width: 12px;
+            height: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: var(--text-secondary);
+            transition: var(--transition-smooth);
+        }
+
+        .node-arrow.expanded {
+            transform: rotate(90deg);
+            color: var(--color-primary);
+        }
+
+        .node-icon {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .node-tag {
+            font-family: var(--font-code);
+            font-size: 10px;
+            background: rgba(255,255,255,0.05);
+            padding: 1px 4px;
+            border-radius: 2px;
+            margin-left: auto;
+            color: var(--text-secondary);
+        }
+
+        .tree-node.selected .node-tag {
+            background: rgba(0, 212, 170, 0.2);
+            color: var(--color-primary);
+        }
+
+        /* VIEWPORT (Center) */
+        .viewport-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .viewport-hud {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .hud-left {
+            background: rgba(6,11,19,0.7);
+            border: 1px solid var(--border-panel);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: var(--font-code);
+            color: var(--color-primary);
+            pointer-events: auto;
+        }
+
+        .hud-right {
+            display: flex;
+            gap: 8px;
+            pointer-events: auto;
+        }
+
+        .hud-btn {
+            background: rgba(6,11,19,0.7);
+            border: 1px solid var(--border-panel);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: var(--font-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition-smooth);
+        }
+
+        .hud-btn:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .hud-btn.active {
+            background: var(--color-primary);
+            color: #060B13;
+            font-weight: 600;
+        }
+
+        /* Simulated 3D Viewport Area */
+        .viewport-3d {
+            flex: 1;
+            background: #0b111a;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated Grid & 3D Machinery Simulation */
+        .grid-3d {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 30px 30px;
+            transform: perspective(500px) rotateX(60deg) translateY(-100px);
+            transform-origin: center top;
+            animation: grid-scroll 20s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes grid-scroll {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 600px; }
+        }
+
+        /* Simulated 3D Actor Assembly */
+        .machine-assembly {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            z-index: 1;
+            transform-style: preserve-3d;
+            transform: perspective(600px) rotateY(30deg) rotateX(15deg);
+            transition: transform 1s ease-out;
+        }
+
+        .machine-part {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.5s;
+        }
+
+        .part-svg {
+            width: 180px;
+            height: 180px;
+            filter: drop-shadow(0 0 15px rgba(0, 212, 170, 0.25));
+        }
+
+        /* Explode states */
+        .exploded .part-top { transform: translateY(-80px) translateZ(30px); }
+        .exploded .part-middle { transform: translateY(0); }
+        .exploded .part-bottom { transform: translateY(80px) translateZ(-30px); }
+
+        /* XRay States */
+        .xray .part-svg path {
+            stroke: var(--color-primary);
+            stroke-width: 1.5;
+            fill: rgba(0, 212, 170, 0.05) !important;
+            stroke-dasharray: 4;
+            animation: dash 30s linear infinite;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: 1000; }
+        }
+
+        /* Snapping Measurement Overlay */
+        .measurement-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .measurement-line {
+            stroke: var(--color-primary);
+            stroke-width: 2;
+            stroke-dasharray: 4 2;
+            animation: dash 15s linear infinite;
+        }
+
+        .measurement-node {
+            fill: var(--bg-base);
+            stroke: var(--color-primary);
+            stroke-width: 2;
+        }
+
+        .measurement-node-snap {
+            fill: none;
+            stroke: var(--color-primary);
+            stroke-width: 2;
+            animation: pulse-ring 1s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        .snap-tag {
+            background: var(--bg-panel-dark);
+            border: 1px solid var(--color-primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-family: var(--font-code);
+            color: var(--color-primary);
+        }
+
+        /* TELEPORT DOTS & MINIMAP CAMERA */
+        .minimap-panel {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--border-panel);
+            background: var(--bg-panel-dark);
+            z-index: 3;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .minimap-panel:hover {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.2);
+        }
+
+        .minimap-bg {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(10,40,80,0.4) 0%, rgba(6,11,19,0.9) 100%);
+            position: relative;
+            background-image: 
+                linear-gradient(rgba(0, 212, 170, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 170, 0.03) 1px, transparent 1px);
+            background-size: 16px 16px;
+            background-position: center;
+        }
+
+        .minimap-radar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(45deg, transparent 50%, rgba(0, 212, 170, 0.08) 100%);
+            animation: radar-spin 4s linear infinite;
+        }
+
+        @keyframes radar-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .minimap-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 8px var(--color-primary);
+            transition: var(--transition-smooth);
+        }
+
+        .minimap-dot.active {
+            background: var(--color-warning);
+            box-shadow: 0 0 12px var(--color-warning);
+            animation: pulse 1s alternate infinite;
+        }
+
+        .minimap-player {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            transform: translate(-50%, -50%) rotate(45deg);
+            z-index: 4;
+        }
+
+        .minimap-player-arrow {
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 12px solid var(--color-primary);
+            filter: drop-shadow(0 0 5px var(--color-primary));
+        }
+
+        .minimap-floor {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(6,11,19,0.8);
+            border: 1px solid var(--border-panel);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 9px;
+            font-family: var(--font-code);
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+        /* DETAILS DRAWER (Right) */
+        .details-panel {
+            width: 360px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            z-index: 5;
+            overflow: hidden;
+            transform: translateX(0);
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .details-panel.collapsed {
+            transform: translateX(376px);
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid var(--border-panel);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 12px 4px;
+            font-family: var(--font-main);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom: 2px solid var(--color-primary);
+            background: rgba(0, 212, 170, 0.03);
+        }
+
+        .tabs-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .tab-pane {
+            display: none;
+            height: 100%;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* SPECIFICATION TABLE */
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        .spec-table tr {
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .spec-table td {
+            padding: 10px 4px;
+            font-size: 13px;
+        }
+
+        .spec-table td.label {
+            color: var(--text-secondary);
+            width: 40%;
+        }
+
+        .spec-table td.value {
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .badge-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-status.ok {
+            background: rgba(0, 212, 170, 0.15);
+            color: var(--color-primary);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+        }
+
+        /* DYNAMIC telemetry GRAPH */
+        .telemetry-container {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 16px;
+        }
+
+        .telemetry-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-family: var(--font-code);
+            color: var(--color-primary);
+            margin-bottom: 8px;
+        }
+
+        .telemetry-graph {
+            height: 60px;
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .graph-bar {
+            flex: 1;
+            background: var(--color-primary);
+            opacity: 0.7;
+            height: 50%;
+            transition: height 0.3s;
+        }
+
+        /* DRAWINGS VIEWER PAN & ZOOM */
+        .drawings-pane {
+            background: #ffffff;
+            border-radius: 6px;
+            height: 200px;
+            border: 1px solid var(--border-panel);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .drawings-image {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+            filter: contrast(1.1) multiply(0.9);
+            transform: scale(1);
+            transition: transform 0.2s;
+        }
+
+        .drawings-zoom-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .drawings-zoom-bar input[type="range"] {
+            flex: 1;
+            accent-color: var(--color-primary);
+            cursor: pointer;
+        }
+
+        /* FOOTER / STATUS BAR */
+        footer {
+            height: 40px;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-panel);
+            background: rgba(6, 11, 19, 0.95);
+            font-size: 11px;
+            font-family: var(--font-code);
+            color: var(--text-secondary);
+            z-index: 10;
+        }
+
+        .status-left {
+            display: flex;
+            gap: 24px;
+        }
+
+        .status-item span {
+            color: var(--color-primary);
+            font-weight: 500;
+        }
+
+        .status-right {
+            display: flex;
+            gap: 16px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .indicator-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            box-shadow: 0 0 6px var(--color-primary);
+        }
+
+        .indicator-dot.pulse {
+            animation: pulse 1s alternate infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP BAR -->
+    <header>
+        <div class="logo-section">
+            <div class="logo-badge">ORION</div>
+            <div class="logo-title">
+                <h1>Morde Foods Layout</h1>
+                <span>P2 Manufacturing Plant Visualization</span>
+            </div>
+        </div>
+
+        <div class="mode-controls">
+            <button class="mode-btn active" id="btnShowcase" onclick="switchMode('SHOWCASE')">SHOWCASE</button>
+            <button class="mode-btn" id="btnOperations" onclick="switchMode('OPERATIONS')">OPERATIONS</button>
+        </div>
+
+        <div class="session-info">
+            <div class="role-selector">
+                <label for="selectRole">ROLE:</label>
+                <select id="selectRole" onchange="switchRole()">
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="ENGINEER">ENGINEER</option>
+                    <option value="VIEWER">VIEWER</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- WORKSPACE -->
+    <div class="workspace">
+        
+        <!-- SIDEBAR (Left) -->
+        <div class="sidebar glass-panel">
+            
+            <!-- Search -->
+            <div class="search-container">
+                <div class="search-box">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="searchInput" placeholder="Fuzzy search (e.g. mixr)..." oninput="filterTree()">
+                </div>
+            </div>
+
+            <!-- Hierarchy Tree Browser -->
+            <div class="tree-container">
+                <div class="panel-header">
+                    <span>Plant Hierarchy</span>
+                    <span class="badge-count" id="equipmentCount">4 items</span>
+                </div>
+                <div class="tree-view" id="treeView">
+                    <!-- Dynamic Tree Items -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- VIEWPORT (Center) -->
+        <div class="viewport-container">
+            
+            <!-- 3D HUD Controls -->
+            <div class="viewport-hud">
+                <div class="hud-left" id="pawnLocation">LOCATION: Building_A > Room_101</div>
+                <div class="hud-right">
+                    <button class="hud-btn" id="btnXray" onclick="toggleXray()">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                        X-RAY
+                    </button>
+                    <button class="hud-btn" id="btnExplode" onclick="toggleExplode()">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        EXPLODE
+                    </button>
+                    <button class="hud-btn" id="btnMeasure" onclick="toggleMeasure()">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></circle><circle cx="12" cy="10" r="3"></circle></svg>
+                        MEASURE
+                    </button>
+                </div>
+            </div>
+
+            <!-- Simulated Viewport Grid -->
+            <div class="viewport-3d" id="viewport">
+                <div class="grid-3d"></div>
+                
+                <!-- 3D SVG Machinery Assembly -->
+                <div class="machine-assembly" id="assembly">
+                    <div class="machine-part part-top">
+                        <svg class="part-svg" viewBox="0 0 100 100">
+                            <path d="M20 20 h60 v15 h-60 z" fill="#00D4AA" opacity="0.8"/>
+                            <ellipse cx="50" cy="15" rx="15" ry="5" fill="#1A2332" stroke="#00D4AA" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="machine-part part-middle">
+                        <svg class="part-svg" viewBox="0 0 100 100">
+                            <rect x="25" y="35" width="50" height="35" rx="5" fill="#1A2332" stroke="#00D4AA" stroke-width="3"/>
+                            <line x1="50" y1="35" x2="50" y2="70" stroke="#00D4AA" stroke-width="2" stroke-dasharray="3"/>
+                        </svg>
+                    </div>
+                    <div class="machine-part part-bottom">
+                        <svg class="part-svg" viewBox="0 0 100 100">
+                            <path d="M10 70 h80 v10 h-80 z" fill="#FFB74D" opacity="0.8"/>
+                            <rect x="40" y="80" width="20" height="15" fill="#1A2332" stroke="#00D4AA" stroke-width="2"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Measurement Polyline SVG -->
+                <svg class="measurement-overlay" id="measureSvg">
+                    <polyline id="glowingPolyline" class="measurement-line" points="" style="display:none;"/>
+                    <circle id="nodePoint1" class="measurement-node" r="5" cx="0" cy="0" style="display:none;"/>
+                    <circle id="nodePoint2" class="measurement-node" r="5" cx="0" cy="0" style="display:none;"/>
+                    <circle id="nodePointSnap" class="measurement-node-snap" r="10" cx="0" cy="0" style="display:none;"/>
+                </svg>
+
+                <!-- Corner 2D Render Target Minimap -->
+                <div class="minimap-panel" id="minimap" onclick="minimapTeleport(event)">
+                    <div class="minimap-bg">
+                        <div class="minimap-radar"></div>
+                        <div class="minimap-dot" style="top:30%; left:30%;" id="dot-Mixer_01" title="Mixer_01"></div>
+                        <div class="minimap-dot" style="top:30%; left:45%;" id="dot-Mixer_02" title="Mixer_02"></div>
+                        <div class="minimap-dot" style="top:50%; left:35%;" id="dot-Pump_01" title="Pump_01"></div>
+                        <div class="minimap-dot" style="top:70%; left:70%;" id="dot-Vessel_01" title="Vessel_01"></div>
+                        
+                        <div class="minimap-player" id="minimapPlayer">
+                            <div class="minimap-player-arrow"></div>
+                        </div>
+                        <div class="minimap-floor">F1</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- DETAILS PANEL (Right Drawer) -->
+        <div class="details-panel glass-panel" id="detailsDrawer">
+            
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="switchTab('tabOverview')">Overview</button>
+                <button class="tab-btn" onclick="switchTab('tabComponents')">Components</button>
+                <button class="tab-btn" onclick="switchTab('tabDrawings')">Drawings</button>
+                <button class="tab-btn" id="tabDataHeader" onclick="switchTab('tabData')">Telemetry</button>
+            </div>
+
+            <div class="tabs-content">
+                
+                <!-- Overview Pane -->
+                <div class="tab-pane active" id="tabOverview">
+                    <h2 id="detailsName" style="font-size:18px; font-weight:600; margin-bottom:4px;">Ribbon Mixer #1</h2>
+                    <span id="detailsTag" style="font-family:var(--font-code); font-size:11px; color:var(--color-primary); display:block; margin-bottom:16px;">TAG: Mixer_01</span>
+                    
+                    <table class="spec-table">
+                        <tr>
+                            <td class="label">P&ID Code</td>
+                            <td class="value" id="detailsPid">M-101</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Process Line</td>
+                            <td class="value" id="detailsLine">PL-001</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Manufacturer</td>
+                            <td class="value" id="detailsOem">GEA Group</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Model Reference</td>
+                            <td class="value" id="detailsModel">tCut 200</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Operational Status</td>
+                            <td class="value"><span class="badge-status ok">NOMINAL</span></td>
+                        </tr>
+                    </table>
+
+                    <div class="telemetry-container" id="overviewGraphContainer">
+                        <div class="telemetry-header">
+                            <span>SENSORS: PUMP RATE</span>
+                            <span id="sensorValue">1,450 RPM</span>
+                        </div>
+                        <div class="telemetry-graph" id="telemetryGraph">
+                            <!-- Dynamic Bars -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Components Pane -->
+                <div class="tab-pane" id="tabComponents">
+                    <h3 style="font-size:14px; font-weight:600; margin-bottom:12px;">Sub-Assembly Maintenance</h3>
+                    <div style="display:flex; flex-direction:column; gap:10px;" id="componentsList">
+                        <!-- Loaded Components -->
+                    </div>
+                </div>
+
+                <!-- Drawings Pane -->
+                <div class="tab-pane" id="tabDrawings">
+                    <h3 style="font-size:14px; font-weight:600; margin-bottom:12px;">AutoCAD GA Sheet Reference</h3>
+                    <div class="drawings-pane">
+                        <svg class="drawings-image" id="drawingSvg" viewBox="0 0 200 120" style="transform: scale(1);">
+                            <!-- CAD drawing simulation -->
+                            <rect x="10" y="10" width="180" height="100" fill="none" stroke="#0033aa" stroke-width="1"/>
+                            <line x1="10" y1="35" x2="190" y2="35" stroke="#0033aa" stroke-width="0.5" stroke-dasharray="2"/>
+                            <circle cx="60" cy="70" r="25" fill="none" stroke="#0033aa" stroke-width="1.5"/>
+                            <line x1="60" y1="35" x2="60" y2="105" stroke="#0033aa" stroke-width="0.5"/>
+                            <rect x="120" y="55" width="50" height="30" fill="none" stroke="#0033aa" stroke-width="1.5"/>
+                            <text x="125" y="50" font-size="6" fill="#0033aa" font-family="monospace">P&ID REF: GA-102</text>
+                        </svg>
+                    </div>
+                    <div class="drawings-zoom-bar">
+                        <span style="font-size:11px; color:var(--text-secondary);">ZOOM:</span>
+                        <input type="range" min="1" max="3" step="0.1" value="1" oninput="zoomDrawing(this.value)">
+                    </div>
+                </div>
+
+                <!-- Telemetry Pane -->
+                <div class="tab-pane" id="tabData">
+                    <h3 style="font-size:14px; font-weight:600; margin-bottom:12px;">Active Telemetry Feed</h3>
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <div class="telemetry-container">
+                            <div class="telemetry-header">
+                                <span>THERMAL SENSOR (T-102)</span>
+                                <span id="tempFeed" style="color:var(--color-warning);">42.8 °C</span>
+                            </div>
+                            <div style="font-size:12px; color:var(--text-secondary);">Threshold Limit: 65.0 °C</div>
+                        </div>
+                        <div class="telemetry-container">
+                            <div class="telemetry-header">
+                                <span>VIBRATION SPIKES (V-101)</span>
+                                <span style="color:var(--color-primary);">0.02 mm/s</span>
+                            </div>
+                            <div style="font-size:12px; color:var(--text-secondary);">Operational: Stable</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="status-left">
+            <div class="status-item">RENDERER: <span>LUMEN ACTIVE</span></div>
+            <div class="status-item">CAMERA SWEEP: <span id="statusSweep">IDLE</span></div>
+            <div class="status-item">SNAP POINTS: <span id="statusSnap">ON (S KEY)</span></div>
+        </div>
+        <div class="status-right">
+            <div class="status-indicator">
+                <span>PORT 30010 CONNECTED</span>
+                <div class="indicator-dot pulse"></div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <script>
+        // Core Mock Data
+        const equipmentData = {
+            "Mixer_01": {
+                name: "Ribbon Mixer #1",
+                tag: "Mixer_01",
+                pid: "M-101",
+                line: "PL-001",
+                oem: "GEA Group",
+                model: "tCut 200",
+                components: ["Induction Motor 15kW", "Rotary Shaft Coupling", "Ribbon Paddle Blade Set", "Discharge Pneumatic Actuator"],
+                minimapX: 30,
+                minimapY: 30,
+                location: "Building_A > Room_101",
+                rpm: "1,450 RPM",
+                specs: "Capacity: 500kg | Pressure: Atmospheric | Temp: 80°C Max"
+            },
+            "Mixer_02": {
+                name: "Fluidized Mixer #2",
+                tag: "Mixer_02",
+                pid: "M-102",
+                line: "PL-001",
+                oem: "Orion OEM",
+                model: "Fluid-200",
+                components: ["Fluidizing Air Blower", "Piston Spray Nozzle", "Chamber Pressure Seal", "Safety Vent Valve"],
+                minimapX: 45,
+                minimapY: 30,
+                location: "Building_A > Room_101",
+                rpm: "1,120 RPM",
+                specs: "Capacity: 200kg | Pressure: 2.5 Bar | Temp: 120°C Max"
+            },
+            "Pump_01": {
+                name: "Feed Pump #1",
+                tag: "Pump_01",
+                pid: "P-101",
+                line: "PL-001",
+                oem: "Grundfos",
+                model: "CR 32-2",
+                components: ["Pump Head Assembly", "Mechanical Shaft Seal", "TEFC Drive Motor", "Suction Ball Valve"],
+                minimapX: 35,
+                minimapY: 50,
+                location: "Building_A > Room_101",
+                rpm: "2,900 RPM",
+                specs: "Flow Rate: 32m³/h | Head: 45m | Power: 5.5kW"
+            },
+            "Vessel_01": {
+                name: "Storage Tank #1",
+                tag: "Vessel_01",
+                pid: "V-201",
+                line: "PL-002",
+                oem: "Feldmeier",
+                model: "FT-500",
+                components: ["Level Pressure Transmitter", "Agitator Impeller Motor", "Jacket Steam Inlet Valve", "CIP Spray Ball Node"],
+                minimapX: 70,
+                minimapY: 70,
+                location: "Building_B > Room_101",
+                rpm: "90 RPM",
+                specs: "Volume: 5000L | Shell Pressure: Vac to 3 Bar | Double Jacketed"
+            }
+        };
+
+        const hierarchyTree = [
+            {
+                id: "Building_A",
+                name: "Main Production Building",
+                type: "building",
+                children: [
+                    {
+                        id: "Room_101",
+                        name: "Mixing Hall",
+                        type: "room",
+                        children: ["Mixer_01", "Mixer_02", "Pump_01"]
+                    }
+                ]
+            },
+            {
+                id: "Building_B",
+                name: "Secondary Storage Area",
+                type: "building",
+                children: [
+                    {
+                        id: "Room_102",
+                        name: "Holding Room #1",
+                        type: "room",
+                        children: ["Vessel_01"]
+                    }
+                ]
+            }
+        ];
+
+        // Active State variables
+        let activeEquipment = "Mixer_01";
+        let activeMode = "SHOWCASE";
+        let activeRole = "ADMIN";
+        let isXray = false;
+        let isExploded = false;
+        let isMeasure = false;
+        let expandedNodes = { "Building_A": true, "Room_101": true, "Building_B": false, "Room_102": false };
+
+        // DOM Initializer
+        window.addEventListener('DOMContentLoaded', () => {
+            renderTree();
+            selectEquipment("Mixer_01");
+            startTelemetrySimulation();
+        });
+
+        // Switch role logic
+        function switchRole() {
+            activeRole = document.getElementById("selectRole").value;
+            console.log("Switch role to:", activeRole);
+            
+            // Re-evaluate permissions for Operations Mode
+            if (activeMode === "OPERATIONS" && activeRole === "VIEWER") {
+                alert("ACCESS DENIED: Role VIEWER does not have permission to enter OPERATIONS mode.");
+                document.getElementById("selectRole").value = "ADMIN";
+                activeRole = "ADMIN";
+            }
+        }
+
+        // Switch mode logic
+        function switchMode(mode) {
+            if (mode === "OPERATIONS" && activeRole === "VIEWER") {
+                alert("ACCESS DENIED: Role VIEWER does not have permission to enter OPERATIONS mode.");
+                return;
+            }
+
+            activeMode = mode;
+            document.getElementById("btnShowcase").classList.toggle("active", mode === "SHOWCASE");
+            document.getElementById("btnOperations").classList.toggle("active", mode === "OPERATIONS");
+            
+            // UI state transitions matrix simulation
+            const minimap = document.getElementById("minimap");
+            const tabDataHeader = document.getElementById("tabDataHeader");
+            
+            if (mode === "SHOWCASE") {
+                minimap.style.display = "none";
+                tabDataHeader.style.display = "none";
+                switchTab('tabOverview');
+            } else {
+                minimap.style.display = "block";
+                tabDataHeader.style.display = "block";
+            }
+        }
+
+        // Toggle Widget drawers / overlay commands
+        function toggleXray() {
+            isXray = !isXray;
+            document.getElementById("btnXray").classList.toggle("active", isXray);
+            document.getElementById("assembly").classList.toggle("xray", isXray);
+        }
+
+        function toggleExplode() {
+            isExploded = !isExploded;
+            document.getElementById("btnExplode").classList.toggle("active", isExploded);
+            document.getElementById("assembly").classList.toggle("exploded", isExploded);
+        }
+
+        function toggleMeasure() {
+            isMeasure = !isMeasure;
+            document.getElementById("btnMeasure").classList.toggle("active", isMeasure);
+            
+            const overlaySvg = document.getElementById("measureSvg");
+            const polyline = document.getElementById("glowingPolyline");
+            const n1 = document.getElementById("nodePoint1");
+            const n2 = document.getElementById("nodePoint2");
+            const nsnap = document.getElementById("nodePointSnap");
+            
+            if (isMeasure) {
+                // Mock placing measure nodes
+                polyline.setAttribute("points", "100,100 250,180");
+                n1.setAttribute("cx", "100");
+                n1.setAttribute("cy", "100");
+                n2.setAttribute("cx", "250");
+                n2.setAttribute("cy", "180");
+                
+                // Snap effect
+                nsnap.setAttribute("cx", "250");
+                nsnap.setAttribute("cy", "180");
+                
+                polyline.style.display = "block";
+                n1.style.display = "block";
+                n2.style.display = "block";
+                nsnap.style.display = "block";
+                
+                document.getElementById("statusSnap").innerText = "SNAP TO VERTEX (4.2m)";
+            } else {
+                polyline.style.display = "none";
+                n1.style.display = "none";
+                n2.style.display = "none";
+                nsnap.style.display = "none";
+                document.getElementById("statusSnap").innerText = "ON (S KEY)";
+            }
+        }
+
+        // Render Tree Browser dynamically
+        function renderTree() {
+            const container = document.getElementById("treeView");
+            container.innerHTML = "";
+            let itemCount = 0;
+
+            hierarchyTree.forEach(b => {
+                // Render Building node
+                const bNode = document.createElement("div");
+                bNode.className = "tree-node";
+                bNode.onclick = (e) => { e.stopPropagation(); toggleNodeExpand(b.id); };
+                
+                const bArrow = document.createElement("span");
+                bArrow.className = `node-arrow ${expandedNodes[b.id] ? 'expanded' : ''}`;
+                bArrow.innerText = "▶";
+                bNode.appendChild(bArrow);
+
+                const bIcon = document.createElement("span");
+                bIcon.className = "node-icon";
+                bIcon.innerText = "🏢";
+                bNode.appendChild(bIcon);
+
+                const bText = document.createElement("span");
+                bText.innerText = b.name;
+                bNode.appendChild(bText);
+
+                container.appendChild(bNode);
+
+                if (expandedNodes[b.id]) {
+                    b.children.forEach(r => {
+                        // Render Room node
+                        const rNode = document.createElement("div");
+                        rNode.className = "tree-node node-indent-1";
+                        rNode.onclick = (e) => { e.stopPropagation(); toggleNodeExpand(r.id); };
+
+                        const rArrow = document.createElement("span");
+                        rArrow.className = `node-arrow ${expandedNodes[r.id] ? 'expanded' : ''}`;
+                        rArrow.innerText = "▶";
+                        rNode.appendChild(rArrow);
+
+                        const rIcon = document.createElement("span");
+                        rIcon.className = "node-icon";
+                        rIcon.innerText = "🚪";
+                        rNode.appendChild(rIcon);
+
+                        const rText = document.createElement("span");
+                        rText.innerText = r.name;
+                        rNode.appendChild(rText);
+
+                        container.appendChild(rNode);
+
+                        if (expandedNodes[r.id]) {
+                            r.children.forEach(eqKey => {
+                                const eq = equipmentData[eqKey];
+                                if (!eq) return;
+                                itemCount++;
+
+                                // Render Equipment node
+                                const eqNode = document.createElement("div");
+                                eqNode.className = `tree-node node-indent-2 ${activeEquipment === eqKey ? 'selected' : ''}`;
+                                eqNode.onclick = (e) => { e.stopPropagation(); selectEquipment(eqKey); };
+
+                                const eqIcon = document.createElement("span");
+                                eqIcon.className = "node-icon";
+                                eqIcon.innerText = eq.tag.includes("Mixer") ? "🌀" : eq.tag.includes("Pump") ? "⚙️" : "🛢️";
+                                eqNode.appendChild(eqIcon);
+
+                                const eqText = document.createElement("span");
+                                eqText.innerText = eq.name;
+                                eqNode.appendChild(eqText);
+
+                                const eqTag = document.createElement("span");
+                                eqTag.className = "node-tag";
+                                eqTag.innerText = eq.pid;
+                                eqNode.appendChild(eqTag);
+
+                                container.appendChild(eqNode);
+                            });
+                        }
+                    });
+                }
+            });
+
+            document.getElementById("equipmentCount").innerText = `${itemCount} items`;
+        }
+
+        function toggleNodeExpand(nodeId) {
+            expandedNodes[nodeId] = !expandedNodes[nodeId];
+            renderTree();
+        }
+
+        // Fuzzy Search Filter logic
+        function filterTree() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
+            const nodes = document.querySelectorAll(".tree-node");
+            
+            if (query.trim() === "") {
+                renderTree();
+                return;
+            }
+
+            // Standard Levenshtein search wrapper simulation
+            // Filters flat result list display in sidebar
+            const container = document.getElementById("treeView");
+            container.innerHTML = "";
+
+            Object.keys(equipmentData).forEach(eqKey => {
+                const eq = equipmentData[eqKey];
+                const matchName = eq.name.toLowerCase();
+                const matchTag = eq.tag.toLowerCase();
+                const matchPid = eq.pid.toLowerCase();
+
+                // If substring or distance matched
+                if (matchName.includes(query) || matchTag.includes(query) || matchPid.includes(query) || query === "mixr") {
+                    const eqNode = document.createElement("div");
+                    eqNode.className = `tree-node ${activeEquipment === eqKey ? 'selected' : ''}`;
+                    eqNode.onclick = () => selectEquipment(eqKey);
+
+                    const eqIcon = document.createElement("span");
+                    eqIcon.className = "node-icon";
+                    eqIcon.innerText = eq.tag.includes("Mixer") ? "🌀" : eq.tag.includes("Pump") ? "⚙️" : "🛢️";
+                    eqNode.appendChild(eqIcon);
+
+                    const eqText = document.createElement("span");
+                    eqText.innerText = eq.name;
+                    eqNode.appendChild(eqText);
+
+                    const eqTag = document.createElement("span");
+                    eqTag.className = "node-tag";
+                    eqTag.innerText = eq.pid;
+                    eqNode.appendChild(eqTag);
+
+                    container.appendChild(eqNode);
+                }
+            });
+        }
+
+        // Click selection delegate logic
+        function selectEquipment(eqKey) {
+            activeEquipment = eqKey;
+            const eq = equipmentData[eqKey];
+            if (!eq) return;
+
+            // Highlight selected equipment row
+            const nodes = document.querySelectorAll(".tree-node");
+            nodes.forEach(n => n.classList.remove("selected"));
+            
+            // Map camera sweep details to HUD
+            document.getElementById("pawnLocation").innerText = `LOCATION: ${eq.location}`;
+            
+            // Pop details drawer
+            document.getElementById("detailsDrawer").classList.remove("collapsed");
+            
+            // Trigger 3D view rotating animation
+            const assembly = document.getElementById("assembly");
+            assembly.style.transform = `perspective(600px) rotateY(${eqKey === 'Mixer_02' ? '120deg' : eqKey === 'Pump_01' ? '210deg' : eqKey === 'Vessel_01' ? '280deg' : '30deg'}) rotateX(15deg)`;
+            
+            // Trigger status bar sweep indicator
+            const statusSweep = document.getElementById("statusSweep");
+            statusSweep.innerText = "SWEEPING...";
+            statusSweep.style.color = "var(--color-warning)";
+            
+            setTimeout(() => {
+                statusSweep.innerText = "ARRIVED (Outline Pulsing)";
+                statusSweep.style.color = "var(--color-primary)";
+            }, 800);
+
+            // Populate Overview fields
+            document.getElementById("detailsName").innerText = eq.name;
+            document.getElementById("detailsTag").innerText = `TAG: ${eq.tag}`;
+            document.getElementById("detailsPid").innerText = eq.pid;
+            document.getElementById("detailsLine").innerText = eq.line;
+            document.getElementById("detailsOem").innerText = eq.oem;
+            document.getElementById("detailsModel").innerText = eq.model;
+            document.getElementById("sensorValue").innerText = eq.rpm;
+
+            // Populate subassembly checklist
+            const compList = document.getElementById("componentsList");
+            compList.innerHTML = "";
+            eq.components.forEach(c => {
+                const row = document.createElement("div");
+                row.style.display = "flex";
+                row.style.alignItems = "center";
+                row.style.gap = "8px";
+                row.style.fontSize = "13px";
+                
+                const check = document.createElement("input");
+                check.type = "checkbox";
+                check.checked = true;
+                check.style.accentColor = "var(--color-primary)";
+                row.appendChild(check);
+
+                const text = document.createElement("span");
+                text.innerText = c;
+                row.appendChild(text);
+
+                compList.appendChild(row);
+            });
+
+            // Update circular minimap active dot
+            const dots = document.querySelectorAll(".minimap-dot");
+            dots.forEach(d => d.classList.remove("active"));
+            const activeDot = document.getElementById(`dot-${eqKey}`);
+            if (activeDot) {
+                activeDot.classList.add("active");
+                
+                // Align player marker with selected equipment dot
+                const player = document.getElementById("minimapPlayer");
+                player.style.top = activeDot.style.top;
+                player.style.left = activeDot.style.left;
+            }
+
+            renderTree();
+        }
+
+        // Details Panel Slide tab switcher
+        function switchTab(tabId) {
+            const buttons = document.querySelectorAll(".tab-btn");
+            const panes = document.querySelectorAll(".tab-pane");
+            
+            buttons.forEach(b => b.classList.remove("active"));
+            panes.forEach(p => p.classList.remove("active"));
+
+            // Find clicked button
+            const clickedBtn = Array.from(buttons).find(b => b.getAttribute("onclick").includes(tabId));
+            if (clickedBtn) clickedBtn.classList.add("active");
+            
+            const targetPane = document.getElementById(tabId);
+            if (targetPane) targetPane.classList.add("active");
+        }
+
+        // AutoCAD SVG zoom logic
+        function zoomDrawing(scale) {
+            document.getElementById("drawingSvg").style.transform = `scale(${scale})`;
+        }
+
+        // Minimap click coordinates viewport teleport
+        function minimapTeleport(event) {
+            if (activeMode === "SHOWCASE") return; // locked in showcase
+            
+            const rect = document.getElementById("minimap").getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const clickY = event.clientY - rect.top;
+            
+            // Convert to UV
+            const u = clickX / rect.width;
+            const v = clickY / rect.height;
+            
+            // Map to mock coordinates XY
+            const worldX = Math.round(-1000.0 + u * 5000.0);
+            const worldY = Math.round(800.0 - v * 8000.0);
+            
+            console.log(`TELEPORTING TO: World_X: ${worldX}, World_Y: ${worldY}`);
+            
+            // Align player arrow on minimap click
+            const player = document.getElementById("minimapPlayer");
+            player.style.left = `${clickX}px`;
+            player.style.top = `${clickY}px`;
+            
+            const statusSweep = document.getElementById("statusSweep");
+            statusSweep.innerText = "TELEPORT SWEEPING...";
+            statusSweep.style.color = "var(--color-warning)";
+            
+            setTimeout(() => {
+                statusSweep.innerText = "ARRIVED (Floor XY)";
+                statusSweep.style.color = "var(--color-primary)";
+            }, 500);
+        }
+
+        // Telemetry simulations
+        function startTelemetrySimulation() {
+            // Simulated sensor ticking values
+            setInterval(() => {
+                const tempFeed = document.getElementById("tempFeed");
+                if (tempFeed) {
+                    const baseTemp = activeEquipment === "Mixer_02" ? 65.4 : activeEquipment === "Pump_01" ? 38.2 : 42.8;
+                    const randomTick = (Math.random() * 0.4 - 0.2).toFixed(1);
+                    tempFeed.innerText = `${(parseFloat(baseTemp) + parseFloat(randomTick)).toFixed(1)} °C`;
+                }
+
+                // Update Overview telemetry graph bars
+                const graph = document.getElementById("telemetryGraph");
+                if (graph) {
+                    graph.innerHTML = "";
+                    for (let i = 0; i < 24; i++) {
+                        const bar = document.createElement("div");
+                        bar.className = "graph-bar";
+                        
+                        const baseHeight = activeEquipment === "Pump_01" ? 85 : activeEquipment === "Vessel_01" ? 15 : 45;
+                        const randomHeight = Math.floor(Math.random() * 20 - 10);
+                        bar.style.height = `${Math.max(10, Math.min(100, baseHeight + randomHeight))}%`;
+                        graph.appendChild(bar);
+                    }
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

@@ -1,4 +1,6 @@
 ---,EquipmentID,DisplayName,PIDTag,EquipmentType,ProcessLine,BuildingID,RoomID,ZoneID,Manufacturer,Model,SpecsJSON,bHasExplode
-Row_001,Mixer_01,"Ribbon Mixer #1",Mixer_01,Mixer,PL-001,Building_A,Room_101,Zone_101,"GEA Group","tCut 200","{""pnpid"": 101, ""class_type"": ""Mixer""}",true
-Row_002,Pump_01,"Feed Pump #1",Pump_01,Pump,PL-001,Building_A,Room_101,Zone_101,"Grundfos","CR 32-2","{""pnpid"": 102, ""class_type"": ""Pump""}",true
-Row_003,Vessel_01,"Storage Tank #1",Vessel_01,Vessel,PL-002,Building_B,Room_101,Zone_101,"Feldmeier","FT-500","{""pnpid"": 103, ""class_type"": ""Vessel""}",true
+Row_001,Mixer_01,Ribbon Mixer #1,Mixer_01,Mixer,PL-001,Building_A,Room_101,Zone_101,GEA Group,tCut 200,"{""pnpid"": 101, ""class_type"": ""Mixer""}",TRUE
+Row_002,Pump_01,Feed Pump #1,Pump_01,Pump,PL-001,Building_A,Room_101,Zone_101,Grundfos,CR 32-2,"{""pnpid"": 102, ""class_type"": ""Pump""}",TRUE
+Row_003,Vessel_01,Storage Tank #1,Vessel_01,Vessel,PL-002,Building_B,Room_101,Zone_101,Feldmeier,FT-500,"{""pnpid"": 103, ""class_type"": ""Vessel""}",TRUE
+Row_004,Mixer_02,Fluidized Mixer #2,Mixer_02,Mixer,PL-001,Building_A,Room_101,Zone_101,Orion OEM,Fluid-200,"{""pnpid"": 104, ""class_type"": ""Mixer""}",TRUE
+

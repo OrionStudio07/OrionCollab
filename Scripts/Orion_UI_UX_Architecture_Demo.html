@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orion Studios — UI/UX Implementation & Blueprint Architecture</title>
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-base: #060B13;
+            --bg-panel: rgba(10, 22, 40, 0.7);
+            --bg-panel-dark: rgba(6, 11, 19, 0.9);
+            --border-panel: rgba(0, 212, 170, 0.15);
+            --border-glow: rgba(0, 212, 170, 0.35);
+            --color-primary: #00D4AA; /* Teal Accent */
+            --color-warning: #FFB74D; /* Amber Caution */
+            --color-alert: #FF5252; /* Red Alert */
+            --text-primary: rgba(255, 255, 255, 0.95);
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --font-main: 'Outfit', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+            --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(10, 40, 80, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(0, 80, 70, 0.15) 0%, transparent 40%),
+                linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        /* Glassmorphic Panel Base Styles */
+        .glass-panel {
+            background: var(--bg-panel);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-panel);
+            border-radius: 8px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            transition: var(--transition-smooth);
+        }
+
+        .glass-panel:hover {
+            border-color: var(--border-glow);
+        }
+
+        /* HEADER */
+        header {
+            height: 64px;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-panel);
+            background: rgba(6, 11, 19, 0.85);
+            z-index: 10;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, var(--color-primary), #00A68A);
+            color: #060B13;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            letter-spacing: 1px;
+            font-size: 14px;
+            box-shadow: 0 0 15px rgba(0, 212, 170, 0.4);
+        }
+
+        .logo-title h1 {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-title span {
+            font-size: 11px;
+            color: var(--text-secondary);
+            display: block;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 16px;
+        }
+
+        .nav-tab {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            font-family: var(--font-main);
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-tab.active {
+            color: var(--color-primary);
+            background: rgba(0, 212, 170, 0.08);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+        }
+
+        /* WORKSPACE */
+        .workspace {
+            flex: 1;
+            display: flex;
+            padding: 16px;
+            gap: 16px;
+            height: calc(100vh - 64px);
+            overflow: hidden;
+        }
+
+        /* LEFT CONTENT: Widget Tree or Event List */
+        .left-panel {
+            width: 340px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 16px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Dynamic items lists */
+        .scrollable-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        /* TREE ITEM ROW STYLE */
+        .tree-row {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: var(--transition-smooth);
+            gap: 8px;
+            border: 1px solid transparent;
+        }
+
+        .tree-row:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255,255,255,0.05);
+        }
+
+        .tree-row.selected {
+            background: rgba(0, 212, 170, 0.08);
+            border-color: var(--border-panel);
+            color: var(--color-primary);
+            font-weight: 500;
+        }
+
+        .indent-1 { margin-left: 16px; }
+        .indent-2 { margin-left: 32px; }
+
+        /* CENTER CONTENT: Blueprint Graph or Layout Sandbox */
+        .center-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 16px;
+        }
+
+        .canvas-area {
+            flex: 1;
+            background: var(--bg-panel-dark);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Grid Background for Blueprint feeling */
+        .bp-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 166, 138, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 166, 138, 0.025) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: 0;
+        }
+
+        /* BLUEPRINT NODES */
+        .bp-node-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .bp-node {
+            background: rgba(14, 25, 42, 0.95);
+            border: 2px solid #1E293B;
+            border-radius: 6px;
+            width: 260px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            transition: var(--transition-smooth);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bp-node:hover, .bp-node.active {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.25);
+        }
+
+        .bp-node-header {
+            background: linear-gradient(90deg, #1E3A8A, #1D4ED8);
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .bp-node-header.event {
+            background: linear-gradient(90deg, #991B1B, #B91C1C);
+        }
+
+        .bp-node-header.function {
+            background: linear-gradient(90deg, #065F46, #047857);
+        }
+
+        .bp-node-header.macro {
+            background: linear-gradient(90deg, #78350F, #92400E);
+        }
+
+        .bp-node-header span {
+            font-family: var(--font-code);
+            font-size: 10px;
+            opacity: 0.6;
+        }
+
+        .bp-node-body {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 11px;
+            font-family: var(--font-code);
+            color: var(--text-secondary);
+        }
+
+        .bp-pin {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pin-in::before {
+            content: "●";
+            color: #38BDF8;
+            margin-right: 6px;
+        }
+
+        .pin-out::after {
+            content: "●";
+            color: #38BDF8;
+            margin-left: 6px;
+        }
+
+        .pin-exec::before {
+            content: "▷";
+            color: #ffffff;
+            font-size: 14px;
+            margin-right: 6px;
+        }
+
+        .pin-exec-out::after {
+            content: "▷";
+            color: #ffffff;
+            font-size: 14px;
+            margin-left: 6px;
+        }
+
+        /* SVG Wire connections overlay */
+        .bp-wire-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .bp-wire {
+            stroke: #38BDF8;
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+        }
+
+        .bp-wire.exec {
+            stroke: #ffffff;
+            stroke-dasharray: 6 4;
+            animation: dash 10s linear infinite;
+        }
+
+        .bp-wire.pulse {
+            stroke: var(--color-primary);
+            stroke-width: 4;
+            filter: drop-shadow(0 0 8px var(--color-primary));
+        }
+
+        /* RIGHT CONTENT: Code Inspector or Performance Auditor */
+        .right-panel {
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 16px;
+            overflow: hidden;
+        }
+
+        /* CODE VIEWER BOX */
+        .code-container {
+            flex: 1;
+            background: #030712;
+            border: 1px solid rgba(255,255,255,0.03);
+            border-radius: 6px;
+            padding: 12px;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-header {
+            font-family: var(--font-code);
+            font-size: 11px;
+            color: var(--color-primary);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .code-block {
+            font-family: var(--font-code);
+            font-size: 11px;
+            line-height: 1.5;
+            color: #E2E8F0;
+            white-space: pre;
+        }
+
+        .keyword { color: #F43F5E; }
+        .type { color: #38BDF8; }
+        .function { color: #34D399; }
+        .comment { color: #64748B; font-style: italic; }
+
+        /* PERFORMANCE AUDITOR GRAPH */
+        .perf-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .perf-bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .perf-bar-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .perf-bar-bg {
+            height: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .perf-bar-fill {
+            height: 100%;
+            background: var(--color-primary);
+            width: 0;
+            transition: width 0.5s ease-out, background-color 0.5s;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.2);
+        }
+
+        .perf-budget-marker {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: var(--color-alert);
+            left: 60%; /* Represents limit marker */
+        }
+
+        .perf-warning-banner {
+            background: rgba(255, 82, 82, 0.12);
+            border: 1px solid var(--color-alert);
+            color: var(--color-alert);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        /* TOGGLE CONTROLS */
+        .toggle-switch {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .switch-btn {
+            width: 40px;
+            height: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .switch-btn.active {
+            background: var(--color-primary);
+        }
+
+        .switch-nob {
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: var(--transition-smooth);
+        }
+
+        .switch-btn.active .switch-nob {
+            left: 22px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP HEADER -->
+    <header>
+        <div class="logo-section">
+            <div class="logo-badge">ORION DEV</div>
+            <div class="logo-title">
+                <h1>UI/UX Architecture & Wiring Portal</h1>
+                <span>Technical Blueprint Showcase</span>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <button class="nav-tab active" id="tabNavTree" onclick="switchMainTab('WIDGET_TREE')">WIDGET CONSTRUCTOR</button>
+            <button class="nav-tab" id="tabNavGraph" onclick="switchMainTab('BLUEPRINT_GRAPH')">EVENT GRAPH FLOW</button>
+            <button class="nav-tab" id="tabNavPerf" onclick="switchMainTab('PERF_BUDGET')">PERFORMANCE AUDITOR</button>
+        </div>
+
+        <div style="font-family:var(--font-code); font-size:11px; color:var(--text-secondary);">
+            BUILD CONFIG: <span style="color:var(--color-primary); font-weight:600;">DebugGame PIE</span>
+        </div>
+    </header>
+
+    <!-- WORKSPACE -->
+    <div class="workspace">
+
+        <!-- LEFT PANEL (Sidebar details depending on tab) -->
+        <div class="left-panel glass-panel">
+            <div id="leftTitle" class="panel-header">WIDGET HIERARCHY TREE</div>
+            
+            <div class="scrollable-list" id="leftList">
+                <!-- Dynamically rendered depending on active view -->
+            </div>
+        </div>
+
+        <!-- CENTER PANEL (Interactive visual Sandbox / Blueprint Graph) -->
+        <div class="center-panel">
+            <div class="canvas-area">
+                <div class="bp-grid"></div>
+                
+                <!-- Blueprint Graph SVGs & Nodes Container -->
+                <div class="bp-node-container" id="centerCanvas">
+                    <!-- Loaded dynamically via JavaScript depending on workflow -->
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL (Code Inspector or Settings) -->
+        <div class="right-panel glass-panel">
+            <div id="rightTitle" class="panel-header">C++ HEADER WIRING</div>
+            
+            <div class="code-container" id="rightContainer">
+                <!-- Interactive code viewer or telemetry auditor parameters -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Data Specifications
+        const widgetTreeData = {
+            "WBP_OrionRoot": {
+                name: "WBP_OrionRoot",
+                cppParent: "UUserWidget",
+                anchor: "Full Viewport Stretch (0, 0, 1, 1)",
+                timeline: "Slide-In Timeline (0.3s Ease-Out Curve)",
+                purpose: "Root layout viewport manager. Holds absolute panels, draws outlines, binds to the subsystem multicast delegators on Construct, and slide-toggles folders on Mode transitions.",
+                wiring: `class <span class="type">WBP_OrionRoot</span> : public <span class="type">UUserWidget</span> {
+    <span class="keyword">GENERATED_BODY</span>()
+public:
+    <span class="keyword">virtual void</span> <span class="function">NativeConstruct</span>() <span class="keyword">override</span>;
+    <span class="keyword">void</span> <span class="function">ConfigureUIForMode</span>(EOrionMode Mode);
+};`
+            },
+            "WBP_TopBar": {
+                name: "WBP_TopBar",
+                cppParent: "UUserWidget",
+                anchor: "Top edge anchor (0, 0, 1, 0.08)",
+                timeline: "Fade-In (0.15s linear)",
+                purpose: "Horizontal branded header. Retrieves raw company name, plant name, and logo path variables directly from the OrionConfigSubsystem CDO inside the game instance.",
+                wiring: `class <span class="type">WBP_TopBar</span> : public <span class="type">UUserWidget</span> {
+    <span class="keyword">UPROPERTY</span>(meta = (BindWidget))
+    <span class="keyword">class</span> <span class="type">UImage</span>* IMG_ClientLogo;
+    
+    <span class="keyword">UPROPERTY</span>(meta = (BindWidget))
+    <span class="keyword">class</span> <span class="type">UTextBlock</span>* TXT_PlantName;
+};`
+            },
+            "WBP_SidePanel": {
+                name: "WBP_SidePanel",
+                cppParent: "UUserWidget",
+                anchor: "Left edge anchor (0, 0, 0.25, 1)",
+                timeline: "Slide offset translation -320px to 0px (0.3s curve)",
+                purpose: "Slide-out panel holding the SearchBar and Hierarchical Tree Browser. Listens to selection delegates to auto-collapse drawer when focus is lost.",
+                wiring: `class <span class="type">WBP_SidePanel</span> : public <span class="type">UUserWidget</span> {
+    <span class="keyword">UPROPERTY</span>(meta = (BindWidget))
+    <span class="keyword">class</span> <span class="type">UWBP_SearchBar</span>* WBP_SearchBar;
+    
+    <span class="keyword">UPROPERTY</span>(meta = (BindWidget))
+    <span class="keyword">class</span> <span class="type">UWBP_TreeBrowser</span>* WBP_TreeBrowser;
+};`
+            },
+            "WBP_Minimap": {
+                name: "WBP_Minimap",
+                cppParent: "UUserWidget",
+                anchor: "Bottom right corner (0.85, 0.85, 0.98, 0.98)",
+                timeline: "Circular radial expand (0.2s easing)",
+                purpose: "2D radar projection corners widget. Binds directly to RT_Minimap (the throttled render target texture) and converts raw mouse widget clicks into world-space vector coordinates to fire teleport commands.",
+                wiring: `class <span class="type">WBP_Minimap</span> : public <span class="type">UUserWidget</span> {
+    <span class="keyword">UFUNCTION</span>()
+    <span class="keyword">void</span> <span class="function">ConvertWidgetClickToWorld</span>(FVector2D ClickLoc, FVector& OutWorldLoc);
+};`
+            },
+            "WBP_EquipmentDetails": {
+                name: "WBP_EquipmentDetails",
+                cppParent: "UUserWidget",
+                anchor: "Right edge slider (0.75, 0, 1, 1)",
+                timeline: "Slide offset translation +360px to 0px (0.3s ease-out)",
+                purpose: "Main sliding specification panel. Binds custom events to DT_Equipment table cells, dynamically generating SpecsJSON rows, and dynamically importing GA AutoCAD drawings via raw PNG binary buffers.",
+                wiring: `class <span class="type">WBP_EquipmentDetails</span> : public <span class="type">UUserWidget</span> {
+    <span class="keyword">UFUNCTION</span>()
+    <span class="keyword">void</span> <span class="function">PopulateTabs</span>(FName EquipmentID);
+};`
+            }
+        };
+
+        const flowWorkflows = {
+            "MODE_SWITCH": {
+                name: "Mode Switch Workflow",
+                steps: [
+                    { title: "1. Switch Event", desc: "User triggers option dropdown in WBP_TopBar.", nodeType: "event", nodeName: "OnClicked (BTN_Operations)" },
+                    { title: "2. SetMode Call", desc: "Calls C++ Subsystem SetMode() to re-verify role.", nodeType: "function", nodeName: "OrionModeManager->SetMode" },
+                    { title: "3. Broadcast Delegate", desc: "Broadcasts multicast delegate FOnModeChanged.", nodeType: "macro", nodeName: "OnModeChanged.Broadcast()" },
+                    { title: "4. UI Transition", desc: "WBP_OrionRoot triggers timelines to re-draw panels.", nodeType: "event", nodeName: "ConfigureUIForMode(OPERATIONS)" }
+                ],
+                wiring: `void <span class="type">UOrionModeManager</span>::<span class="function">SetMode</span>(EOrionMode NewMode) {
+    if (!<span class="function">CanAccessMode</span>(NewMode, CurrentRole)) return;
+    EOrionMode OldMode = CurrentMode;
+    CurrentMode = NewMode;
+    <span class="comment">// Broadcast the delegate to all listening widgets</span>
+    OnModeChanged.<span class="function">Broadcast</span>(OldMode, CurrentMode);
+}`
+            },
+            "EQUIPMENT_SELECT": {
+                name: "Selection & Sweep Flow",
+                steps: [
+                    { title: "1. Node Clicked", desc: "WBP_TreeBrowser broadcasts selection event.", nodeType: "event", nodeName: "OnNodeClicked (Tree Item)" },
+                    { title: "2. Sweep Start", desc: "BP_CameraSweepManager begins optimal framing math.", nodeType: "function", nodeName: "SweepToActor(Mixer_01)" },
+                    { title: "3. Post-Process Highlight", desc: "Arrival triggers glowing teal stencil outlines.", nodeType: "macro", nodeName: "ApplyPulsingHighlight()" },
+                    { title: "4. Spec Population", desc: "Loads specs & AutoCAD drawing PNGs inside the sidebar drawer.", nodeType: "event", nodeName: "WBP_EquipmentDetails::Populate()" }
+                ],
+                wiring: `void <span class="type">UOrionHierarchyManager</span>::<span class="function">SelectEquipment</span>(FName EquipmentID) {
+    OnEquipmentSelected.<span class="function">Broadcast</span>(EquipmentID);
+    <span class="comment">// Triggers camera sweep automatically</span>
+}`
+            },
+            "MINIMAP_TELEPORT": {
+                name: "Minimap Teleport Flow",
+                steps: [
+                    { title: "1. Map Clicked", desc: "Widget captures click vectors in coordinate bounds.", nodeType: "event", nodeName: "WBP_Minimap::OnMouseDown" },
+                    { title: "2. Vector Translate", desc: "Calculates orthographic camera XY world position.", nodeType: "function", nodeName: "ConvertUVToWorldCoordinates" },
+                    { title: "3. Collision Check", desc: "Executes downward trace to confirm walkable surface.", nodeType: "macro", nodeName: "TraceForTeleportFloor()" },
+                    { title: "4. Teleport Execution", desc: "Moves the camera and player pawn with seamless panning.", nodeType: "event", nodeName: "TeleportPawnToCoordinates()" }
+                ],
+                wiring: `FVector <span class="type">UWBP_Minimap</span>::<span class="function">ConvertUVToWorld</span>(float U, float V) {
+    float X = OrthoMinX + U * (OrthoMaxX - OrthoMinX);
+    float Y = OrthoMinY + V * (OrthoMaxY - OrthoMinY);
+    return FVector(X, Y, FloorZ);
+}`
+            }
+        };
+
+        // Active State variables
+        let activeMainTab = "WIDGET_TREE";
+        let activeWidgetKey = "WBP_OrionRoot";
+        let activeWorkflowKey = "MODE_SWITCH";
+        
+        // Performance Auditor Variables
+        let isVirtualizationEnabled = true;
+        let minimapTickRate = 10; // fps
+
+        // Initialize Page
+        window.addEventListener('DOMContentLoaded', () => {
+            switchMainTab("WIDGET_TREE");
+        });
+
+        // Switch main Navigation tabs
+        function switchMainTab(tab) {
+            activeMainTab = tab;
+            
+            // Adjust header button styles
+            document.getElementById("tabNavTree").classList.toggle("active", tab === "WIDGET_TREE");
+            document.getElementById("tabNavGraph").classList.toggle("active", tab === "BLUEPRINT_GRAPH");
+            document.getElementById("tabNavPerf").classList.toggle("active", tab === "PERF_BUDGET");
+
+            if (tab === "WIDGET_TREE") {
+                document.getElementById("leftTitle").innerText = "WIDGET HIERARCHY TREE";
+                document.getElementById("rightTitle").innerText = "C++ HEADER WIRING";
+                renderWidgetTreeList();
+                selectWidget("WBP_OrionRoot");
+            } 
+            else if (tab === "BLUEPRINT_GRAPH") {
+                document.getElementById("leftTitle").innerText = "INTERACTIVE WORKFLOWS";
+                document.getElementById("rightTitle").innerText = "C++ WIRING CODE";
+                renderWorkflowList();
+                selectWorkflow("MODE_SWITCH");
+            }
+            else if (tab === "PERF_BUDGET") {
+                document.getElementById("leftTitle").innerText = "AUDITOR OPTIMIZATIONS";
+                document.getElementById("rightTitle").innerText = "BUDGET AUDIT TIMELINE";
+                renderAuditorControls();
+                updateAuditorTimeline();
+            }
+        }
+
+        // --- TAB 1: WIDGET CONSTRUCTOR ---
+        function renderWidgetTreeList() {
+            const list = document.getElementById("leftList");
+            list.innerHTML = "";
+
+            Object.keys(widgetTreeData).forEach(key => {
+                const w = widgetTreeData[key];
+                const row = document.createElement("div");
+                row.className = `tree-row ${activeWidgetKey === key ? 'selected' : ''}`;
+                
+                // Add margins according to depth simulation
+                if (key === "WBP_SearchBar" || key === "WBP_TreeBrowser") {
+                    row.classList.add("indent-2");
+                } else if (key !== "WBP_OrionRoot") {
+                    row.classList.add("indent-1");
+                }
+                
+                row.onclick = () => selectWidget(key);
+                row.innerHTML = `<span>⚙️</span> <strong>${w.name}</strong>`;
+                list.appendChild(row);
+            });
+        }
+
+        function selectWidget(key) {
+            activeWidgetKey = key;
+            renderWidgetTreeList();
+
+            const w = widgetTreeData[key];
+            
+            // Render Blueprint Node in Center Canvas
+            const canvas = document.getElementById("centerCanvas");
+            canvas.innerHTML = `
+                <div class="bp-node">
+                    <div class="bp-node-header">
+                        ${w.name}
+                        <span>BP CLASS</span>
+                    </div>
+                    <div class="bp-node-body">
+                        <div class="bp-pin pin-in">Construct</div>
+                        <div class="bp-pin pin-in">Parent: ${w.cppParent}</div>
+                        <div class="bp-pin pin-out">Anchor: ${w.anchor}</div>
+                        <div class="bp-pin pin-out">Timeline: ${w.timeline}</div>
+                    </div>
+                </div>
+                <div style="margin-top:20px; font-size:13px; font-weight:500; text-align:center; padding: 0 40px; color:var(--text-secondary);">
+                    ${w.purpose}
+                </div>
+            `;
+
+            // Populate Code Container
+            const rightContainer = document.getElementById("rightContainer");
+            rightContainer.innerHTML = `
+                <div class="code-header">
+                    <span>${w.name}.h</span>
+                    <span>C++ MODULE</span>
+                </div>
+                <div class="code-block">${w.wiring}</div>
+            `;
+        }
+
+        // --- TAB 2: BLUEPRINT GRAPH ---
+        function renderWorkflowList() {
+            const list = document.getElementById("leftList");
+            list.innerHTML = "";
+
+            Object.keys(flowWorkflows).forEach(key => {
+                const f = flowWorkflows[key];
+                const row = document.createElement("div");
+                row.className = `tree-row ${activeWorkflowKey === key ? 'selected' : ''}`;
+                row.onclick = () => selectWorkflow(key);
+                row.innerHTML = `<span>⚡</span> <strong>${f.name}</strong>`;
+                list.appendChild(row);
+            });
+        }
+
+        function selectWorkflow(key) {
+            activeWorkflowKey = key;
+            renderWorkflowList();
+
+            const f = flowWorkflows[key];
+            
+            // Build animated visual Blueprint Graph nodes
+            const canvas = document.getElementById("centerCanvas");
+            canvas.innerHTML = "";
+
+            // Create connection SVG wire overlay
+            const wireSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            wireSvg.setAttribute("class", "bp-wire-svg");
+            canvas.appendChild(wireSvg);
+
+            const nodesContainer = document.createElement("div");
+            nodesContainer.style.display = "flex";
+            nodesContainer.style.gap = "30px";
+            nodesContainer.style.alignItems = "center";
+            nodesContainer.style.justifyContent = "center";
+            nodesContainer.style.width = "100%";
+            nodesContainer.style.height = "100%";
+            canvas.appendChild(nodesContainer);
+
+            f.steps.forEach((step, idx) => {
+                const node = document.createElement("div");
+                node.className = "bp-node";
+                node.style.width = "200px";
+                node.id = `bp-node-${idx}`;
+
+                let headerClass = "";
+                if (step.nodeType === "event") headerClass = "event";
+                if (step.nodeType === "function") headerClass = "function";
+                if (step.nodeType === "macro") headerClass = "macro";
+
+                node.innerHTML = `
+                    <div class="bp-node-header ${headerClass}">
+                        ${step.nodeName}
+                        <span>${step.nodeType.toUpperCase()}</span>
+                    </div>
+                    <div class="bp-node-body" style="font-size:10px;">
+                        <div>${step.title}</div>
+                        <div style="opacity:0.7;">${step.desc}</div>
+                    </div>
+                `;
+
+                nodesContainer.appendChild(node);
+            });
+
+            // Animate wire connections between nodes after rendering
+            setTimeout(() => {
+                wireSvg.innerHTML = "";
+                for (let i = 0; i < f.steps.length - 1; i++) {
+                    const n1 = document.getElementById(`bp-node-${i}`).getBoundingClientRect();
+                    const n2 = document.getElementById(`bp-node-${i+1}`).getBoundingClientRect();
+                    const canvasRect = canvas.getBoundingClientRect();
+
+                    const x1 = n1.right - canvasRect.left;
+                    const y1 = n1.top + n1.height / 2 - canvasRect.top;
+                    const x2 = n2.left - canvasRect.left;
+                    const y2 = n2.top + n2.height / 2 - canvasRect.top;
+
+                    // Draw Bezier Curve
+                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    const controlX = x1 + (x2 - x1) / 2;
+                    path.setAttribute("d", `M ${x1} ${y1} C ${controlX} ${y1}, ${controlX} ${y2}, ${x2} ${y2}`);
+                    path.setAttribute("class", "bp-wire exec");
+                    wireSvg.appendChild(path);
+
+                    // Animate a glowing signal wave along the wire
+                    const signal = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    signal.setAttribute("d", `M ${x1} ${y1} C ${controlX} ${y1}, ${controlX} ${y2}, ${x2} ${y2}`);
+                    signal.setAttribute("class", "bp-wire pulse");
+                    signal.style.strokeDasharray = "30 150";
+                    signal.style.strokeDashoffset = "0";
+                    signal.style.animation = `dash 3s linear infinite`;
+                    wireSvg.appendChild(signal);
+                }
+            }, 100);
+
+            // Populate Code Container
+            const rightContainer = document.getElementById("rightContainer");
+            rightContainer.innerHTML = `
+                <div class="code-header">
+                    <span>${key.toLowerCase()}_handler.cpp</span>
+                    <span>C++ BACKEND INVOCATION</span>
+                </div>
+                <div class="code-block">${f.wiring}</div>
+            `;
+        }
+
+        // --- TAB 3: PERFORMANCE AUDITOR ---
+        function renderAuditorControls() {
+            const list = document.getElementById("leftList");
+            list.innerHTML = `
+                <div class="toggle-switch">
+                    <span>Tree Virtualization (UListView)</span>
+                    <div class="switch-btn ${isVirtualizationEnabled ? 'active' : ''}" onclick="toggleVirtualization()">
+                        <div class="switch-nob"></div>
+                    </div>
+                </div>
+                <div style="font-size:11px; opacity:0.6; padding:0 8px 16px;">
+                    When enabled, list items only render in the scrollbox buffer, supporting 6,500+ items at 60fps. Disabling forces raw widget spawning, causing game thread hitches.
+                </div>
+
+                <div class="toggle-switch">
+                    <span>Minimap Tick Rate</span>
+                    <select id="selectTickRate" onchange="changeMinimapTickRate()" style="background:#091220; color:var(--color-primary); border:1px solid var(--border-panel); border-radius:4px; font-weight:600; font-family:var(--font-code); padding:2px 8px; outline:none; cursor:pointer;">
+                        <option value="10" ${minimapTickRate === 10 ? 'selected' : ''}>10 FPS (Throttled)</option>
+                        <option value="30" ${minimapTickRate === 30 ? 'selected' : ''}>30 FPS (Medium)</option>
+                        <option value="60" ${minimapTickRate === 60 ? 'selected' : ''}>60 FPS (Every Frame)</option>
+                    </select>
+                </div>
+                <div style="font-size:11px; opacity:0.6; padding:0 8px 16px;">
+                    Throttling the top-down minimap Orthographic Scene Capture component prevents redundant GPU rasterizing in the background.
+                </div>
+            `;
+        }
+
+        function toggleVirtualization() {
+            isVirtualizationEnabled = !isVirtualizationEnabled;
+            renderAuditorControls();
+            updateAuditorTimeline();
+        }
+
+        function changeMinimapTickRate() {
+            minimapTickRate = parseInt(document.getElementById("selectTickRate").value);
+            updateAuditorTimeline();
+        }
+
+        function updateAuditorTimeline() {
+            // Render Visual Timeline of budget limits [trd.md §9]
+            const rightContainer = document.getElementById("rightContainer");
+            
+            // Calculate simulated budgets
+            let renderingTime = 8.0; // GPU Base
+            let uiTime = isVirtualizationEnabled ? 0.6 : 8.5; // Virtualization effect
+            let logicTime = minimapTickRate === 10 ? 1.2 : minimapTickRate === 30 ? 2.8 : 5.8; // Tick rate effect
+            let totalFrameTime = renderingTime + uiTime + logicTime;
+            
+            // Budgets thresholds: limit is 16.67ms (60fps)
+            let isBreached = totalFrameTime > 16.67;
+            
+            rightContainer.innerHTML = `
+                <div class="perf-timeline">
+                    <div style="font-size:14px; font-weight:600; color:${isBreached ? 'var(--color-alert)' : 'var(--color-primary)'};">
+                        Frame Latency: ${totalFrameTime.toFixed(2)} ms (${isBreached ? 'FAIL' : 'PASS'})
+                    </div>
+                    
+                    <!-- GPU rendering -->
+                    <div class="perf-bar-wrapper">
+                        <div class="perf-bar-header">
+                            <span>GPU Scene Rendering</span>
+                            <span>${renderingTime.toFixed(1)}ms</span>
+                        </div>
+                        <div class="perf-bar-bg">
+                            <div class="perf-bar-fill" style="width: ${renderingTime / 16.67 * 100}%; background-color:#38BDF8;"></div>
+                            <div class="perf-budget-marker"></div>
+                        </div>
+                    </div>
+
+                    <!-- UMG UI -->
+                    <div class="perf-bar-wrapper">
+                        <div class="perf-bar-header">
+                            <span>UMG UI Drawing</span>
+                            <span style="color:${uiTime > 1.0 ? 'var(--color-alert)' : 'var(--color-primary)'};">${uiTime.toFixed(1)}ms</span>
+                        </div>
+                        <div class="perf-bar-bg">
+                            <div class="perf-bar-fill" style="width: ${uiTime / 16.67 * 100}%; background-color:${uiTime > 1.0 ? 'var(--color-alert)' : 'var(--color-primary)'};"></div>
+                            <div class="perf-budget-marker"></div>
+                        </div>
+                    </div>
+
+                    <!-- Game Logic -->
+                    <div class="perf-bar-wrapper">
+                        <div class="perf-bar-header">
+                            <span>Minimap & Game Logic</span>
+                            <span style="color:${logicTime > 2.0 ? 'var(--color-alert)' : 'var(--color-primary)'};">${logicTime.toFixed(1)}ms</span>
+                        </div>
+                        <div class="perf-bar-bg">
+                            <div class="perf-bar-fill" style="width: ${logicTime / 16.67 * 100}%; background-color:${logicTime > 2.0 ? 'var(--color-alert)' : 'var(--color-primary)'};"></div>
+                            <div class="perf-budget-marker"></div>
+                        </div>
+                    </div>
+                    
+                    ${isBreached ? `
+                    <div class="perf-warning-banner">
+                        <strong>⚠️ RELEASE GATE PERFORMANCE WARNING:</strong>
+                        <span>Frame budget limit (16.67ms) breached. Disabling tree browser list virtualization or unlocking minimap ticking blocks the Game Thread. Release gate requires active optimizations.</span>
+                    </div>
+                    ` : `
+                    <div style="background:rgba(0, 212, 170, 0.08); border:1px solid var(--color-primary); color:var(--color-primary); padding:10px; border-radius:6px; font-size:12px; margin-top:16px;">
+                        <strong>☑️ BUDGET VERDICT: NOMINAL</strong><br/>
+                        All subsystem timelines satisfy the TRD Section 9 performance budget limits. Release gate metrics successfully satisfied.
+                    </div>
+                    `}
+                </div>
+            `;
+
+            // Draw visual sandbox indicator in center canvas
+            const canvas = document.getElementById("centerCanvas");
+            canvas.innerHTML = `
+                <div style="text-align:center; padding:40px; width:100%; display:flex; flex-direction:column; align-items:center; gap:20px; z-index:1;">
+                    <div style="font-size:16px; font-weight:600; color:var(--color-primary);">PERFORMANCE TIMELINE SANDBOX</div>
+                    
+                    <div style="display:flex; gap:20px;">
+                        <div style="background:var(--bg-panel-dark); padding:16px; border-radius:6px; border:1px solid rgba(255,255,255,0.05); width:180px;">
+                            <div style="font-size:11px; opacity:0.6;">VIRTUALIZATION</div>
+                            <div style="font-size:18px; font-weight:700; color:${isVirtualizationEnabled ? 'var(--color-primary)' : 'var(--color-alert)'};">
+                                ${isVirtualizationEnabled ? 'ENABLED (UListView)' : 'DISABLED (ScrollBox)'}
+                            </div>
+                        </div>
+                        <div style="background:var(--bg-panel-dark); padding:16px; border-radius:6px; border:1px solid rgba(255,255,255,0.05); width:180px;">
+                            <div style="font-size:11px; opacity:0.6;">MINIMAP CAPTURE RATE</div>
+                            <div style="font-size:18px; font-weight:700; color:${minimapTickRate === 10 ? 'var(--color-primary)' : 'var(--color-warning)'};">
+                                ${minimapTickRate} FPS
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="font-size:13px; color:var(--text-secondary); max-width:400px; line-height:1.5;">
+                        Adjust optimizations on the left to dynamically visualize how the virtualized component tree and orthographic scene capture rates preserve game thread performance headroom!
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -98,3 +98,41 @@ struct FSearchResult
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orion|Search")
     EEquipmentType EquipmentType = EEquipmentType::Other;
 };
+
+UENUM(BlueprintType)
+enum class EOrionTreeCategory : uint8
+{
+    Building    UMETA(DisplayName = "Building"),
+    Room        UMETA(DisplayName = "Room"),
+    Equipment   UMETA(DisplayName = "Equipment"),
+    Component   UMETA(DisplayName = "Component")
+};
+
+UCLASS(BlueprintType)
+class ORIONCOLLAB_API UOrionTreeItemData : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orion|Hierarchy")
+    FName NodeID;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orion|Hierarchy")
+    FText DisplayName;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orion|Hierarchy")
+    EOrionTreeCategory Category = EOrionTreeCategory::Building;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orion|Hierarchy")
+    EEquipmentType EquipmentType = EEquipmentType::Other;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orion|Hierarchy")
+    int32 Depth = 0;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orion|Hierarchy")
+    bool bIsExpanded = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orion|Hierarchy")
+    FName ParentID;
+};
+

@@ -1,24 +1,18 @@
-# Unreal Engine Git Ignore
+# Unreal Engine build and binary folders
 Binaries/
-Build/
 Intermediate/
 Saved/
 DerivedDataCache/
-FileOpenOrder/
-
-# Visual Studio files
 .vs/
-*.sln
-*.slnx
-*.suo
-*.xsd
-*.user
-*.apound
-*.csproj
-*.vcproj
-*.vcxproj
-*.filters
 
-# OS/General files
-.DS_Store
-Thumbs.db
+# Python cache files
+__pycache__/
+*.pyc
+
+# Local user settings
+.idea/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates

@@ -1,3 +1,6 @@
---- INSPECTING REMOTE CONTROL SETTINGS ---
-Found class: /Script/RemoteControlCommon.RemoteControlSettings
-Properties:
+=== FINDING RUNTIME VIEWPORT WIDGETS ===
+Starting simulation...
+Active PIE World: SampleLevel
+Querying active UserWidgets...
+Total active UserWidgets found: 0
+Simulation stopped.

@@ -126,9 +126,9 @@ enum class EAnnotationCategory : uint8
 UENUM(BlueprintType)
 enum class EOrionSweepSpeed : uint8
 {
-    Fast    = 0  UMETA(DisplayName = "Fast (1s)"),
-    Medium  = 1  UMETA(DisplayName = "Medium (2s)"),
-    Slow    = 2  UMETA(DisplayName = "Slow (3s)")
+    Fast    UMETA(DisplayName = "Fast"),
+    Medium  UMETA(DisplayName = "Medium"),
+    Slow    UMETA(DisplayName = "Slow")
 };
 
 class AActor;

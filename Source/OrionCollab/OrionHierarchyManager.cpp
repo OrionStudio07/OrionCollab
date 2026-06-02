@@ -568,3 +568,99 @@ int32 UOrionHierarchyManager::CalculateLevenshteinDistance(const FString& S1, co
 
     return DP[Len1][Len2];
 }
+
+TArray<UOrionTreeItemData*> UOrionHierarchyManager::BuildInitialTree()
+{
+    TArray<UOrionTreeItemData*> OutTree;
+    for (auto& Elem : BuildingMap)
+    {
+        const FBuildingNode& BNode = Elem.Value;
+        UOrionTreeItemData* Item = NewObject<UOrionTreeItemData>(this);
+        Item->NodeID = BNode.BuildingID;
+        Item->DisplayName = BNode.DisplayName;
+        Item->Category = EOrionTreeCategory::Building;
+        Item->Depth = 0;
+        Item->bIsExpanded = false;
+        Item->ParentID = NAME_None;
+        OutTree.Add(Item);
+    }
+    return OutTree;
+}
+
+TArray<UOrionTreeItemData*> UOrionHierarchyManager::GetChildrenForNode(UOrionTreeItemData* ParentNode)
+{
+    TArray<UOrionTreeItemData*> OutChildren;
+    if (!ParentNode)
+    {
+        return OutChildren;
+    }
+
+    if (ParentNode->Category == EOrionTreeCategory::Building)
+    {
+        const FBuildingNode* BNode = BuildingMap.Find(ParentNode->NodeID);
+        if (BNode)
+        {
+            for (const FRoomNode& RNode : BNode->Rooms)
+            {
+                UOrionTreeItemData* Item = NewObject<UOrionTreeItemData>(this);
+                Item->NodeID = RNode.RoomID;
+                Item->DisplayName = RNode.DisplayName;
+                Item->Category = EOrionTreeCategory::Room;
+                Item->Depth = 1;
+                Item->bIsExpanded = false;
+                Item->ParentID = ParentNode->NodeID;
+                OutChildren.Add(Item);
+            }
+        }
+    }
+    else if (ParentNode->Category == EOrionTreeCategory::Room)
+    {
+        // Find the room
+        for (auto& Blem : BuildingMap)
+        {
+            const FRoomNode* FoundRoom = nullptr;
+            for (const FRoomNode& RNode : Blem.Value.Rooms)
+            {
+                if (RNode.RoomID == ParentNode->NodeID)
+                {
+                    FoundRoom = &RNode;
+                    break;
+                }
+            }
+            if (FoundRoom)
+            {
+                for (const FEquipmentNode& EqNode : FoundRoom->Equipment)
+                {
+                    UOrionTreeItemData* Item = NewObject<UOrionTreeItemData>(this);
+                    Item->NodeID = EqNode.EquipmentID;
+                    Item->DisplayName = EqNode.DisplayName;
+                    Item->Category = EOrionTreeCategory::Equipment;
+                    Item->EquipmentType = EqNode.Type;
+                    Item->Depth = 2;
+                    Item->bIsExpanded = false;
+                    Item->ParentID = ParentNode->NodeID;
+                    OutChildren.Add(Item);
+                }
+                break; // Found the room, stop searching buildings
+            }
+        }
+    }
+    else if (ParentNode->Category == EOrionTreeCategory::Equipment)
+    {
+        TArray<FName> CompIDs = GetComponentsByEquipment(ParentNode->NodeID);
+        for (const FName& CompID : CompIDs)
+        {
+            UOrionTreeItemData* Item = NewObject<UOrionTreeItemData>(this);
+            Item->NodeID = CompID;
+            Item->DisplayName = FText::FromName(CompID);
+            Item->Category = EOrionTreeCategory::Component;
+            Item->Depth = 3;
+            Item->bIsExpanded = false;
+            Item->ParentID = ParentNode->NodeID;
+            OutChildren.Add(Item);
+        }
+    }
+
+    return OutChildren;
+}
+

@@ -60,6 +60,14 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Orion|Hierarchy", BlueprintPure)
     AActor* GetEquipmentActor(FName EquipmentID) const;
 
+    /** Creates initial UOrionTreeItemData objects for all buildings */
+    UFUNCTION(BlueprintCallable, Category = "Orion|Hierarchy")
+    TArray<UOrionTreeItemData*> BuildInitialTree();
+
+    /** Retrieves and instantiates child items for a given expanded tree node */
+    UFUNCTION(BlueprintCallable, Category = "Orion|Hierarchy")
+    TArray<UOrionTreeItemData*> GetChildrenForNode(UOrionTreeItemData* ParentNode);
+
     /** Fires when the tree building process is completed */
     UPROPERTY(BlueprintAssignable, Category = "Orion|Hierarchy")
     FOnTreeReady OnTreeReady;

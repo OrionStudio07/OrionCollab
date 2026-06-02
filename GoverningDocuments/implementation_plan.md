@@ -612,22 +612,18 @@ Level
 
 ---
 
-## Open Questions
-
-> [!IMPORTANT]
-> **Q1: Plant 3D Python Script.** Do you have Python scripting access in your AutoCAD Plant 3D installation? We need to write a script that exports all equipment tags, P&ID numbers, process lines, and specs to JSON. If not, we may need an alternative export method (IFC, or manual CSV from Plant 3D reports).
-
-> [!IMPORTANT]
-> **Q2: 2D CAD Drawings Format.** Will the 2D drawings be exported as PNG images or PDF files? This affects the in-app viewer implementation (image widget vs PDF rendering).
-
-> [!WARNING]
-> **Q3: Equipment Animations.** For the ~200 unique equipment with animations (conveyors, mixers, gears), will these be authored in 3ds Max / Blender as skeletal mesh animations, or should we plan for simple Blueprint-driven procedural animations (rotating, translating, scaling)? This significantly affects the animation pipeline.
+## Resolved Questions
 
 > [!NOTE]
-> **Q4: NPC Character Models.** MetaHumans or Mannequin-based characters? MetaHumans look better but are heavier on performance. For ambient workers in an industrial setting, simpler characters with safety gear/helmets might be sufficient and more performant.
-
-> [!NOTE]
-> **Q5: Session Recording Scope.** Should session recording capture: (a) just camera positions + timestamps (lightweight, ~KB per minute), (b) camera + all interactions/tool usage (medium, ~MB per minute), or (c) full video recording (heavy, ~GB per minute)?
+> **Q1: Plant 3D Python Script.** Resolved. The SQLite extractor `export_plant3d_metadata.py` is fully implemented and tested. It connects directly to AutoCAD Plant 3D SQLite databases (e.g. `Piping.db`), queries the `Equipment` and `EngineeringItems` tables, and exports clean metadata JSON schemas seamlessly.
+> 
+> **Q2: 2D CAD Drawings Format.** Resolved. Lock in **PNG format** for error-free dynamic runtime loading in Unreal Engine via native `UTexture2D` APIs. AutoCAD drawings will be exported as high-resolution PNG images, preventing runtime crashes or license issues associated with third-party PDF plugins.
+> 
+> **Q3: Equipment Animations.** Resolved. Lock in **Skeletal animations** authored in Blender/3ds Max and imported as skeletal meshes, ensuring optimal runtime play rates and lifelike motion without game-thread ticking overhead.
+> 
+> **Q4: NPC Character Models.** Resolved. Lock in **Mannequin-based characters** styled with safety vest and helmet assets, maintaining a high frame rate and fitting the clean industrial visual theme.
+> 
+> **Q5: Session Recording Scope.** Resolved. Captures camera paths, interaction states, and annotations (medium scope, ~MB/min) for optimal balance of playback fidelity and storage efficiency.
 
 ---
 
