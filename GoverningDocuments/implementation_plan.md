@@ -3,7 +3,7 @@
 
 > [!IMPORTANT]
 > **Base:** Unreal Engine 5.8 CollabViewer Template (CVT)
-> **Reference Client:** Morde Foods P2 Manufacturing Plant (6500 tags, 1394 instrumentation points, ~500 process lines, ~200 unique equipment)
+> **Reference Client:** Orion Demo Client P2 Manufacturing Plant (6500 tags, 1394 instrumentation points, ~500 process lines, ~200 unique equipment)
 > **Product Type:** Reusable platform — client content swapped per deployment via config file
 > **Platform Targets:** Desktop (Windows .exe) + PC VR (Meta Quest Link / SteamVR)
 
@@ -115,7 +115,7 @@ WBP_OrionRoot (Root widget — always active)
 ```json
 {
   "client": {
-    "company_name": "Morde Foods",
+    "company_name": "Orion Demo Client",
     "plant_name": "P2 Manufacturing Plant",
     "logo_path": "Content/ClientAssets/Logo.png",
     "accent_color": "#00D4AA"
@@ -637,7 +637,7 @@ Level
 - Config loader tests (valid/invalid JSON handling)
 
 ### Manual Verification
-- 60fps desktop / 72fps VR with Morde Foods scene loaded
+- 60fps desktop / 72fps VR with Orion Demo Client scene loaded
 - Full tree browser navigation with 6500+ equipment entries
 - Search across P&ID tags, equipment names, process lines
 - All CVT enhanced tools (Xray, Explode, CropBox, Measurement) working correctly

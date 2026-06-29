@@ -49,7 +49,7 @@ Key differentiators `[prd.md §Solution]`:
 - **Multi-user collaboration:** Built-in collaborative sessions with role-based permissions and session recording.
 - **Desktop + PC VR:** Single codebase targets both desktop and tethered VR experiences.
 
-**Reference client:** Morde Foods P2 Manufacturing Plant — 6500 tags, 1394 instrumentation points, ~500 process lines, ~200 unique equipment. `[trd.md §1]`
+**Reference client:** Orion Demo Client P2 Manufacturing Plant — 6500 tags, 1394 instrumentation points, ~500 process lines, ~200 unique equipment. `[trd.md §1]`
 
 ---
 
@@ -916,7 +916,7 @@ Save triggers: Auto-save (300s), manual, mode switch, app exit.
 
 | Criterion | Threshold |
 |-----------|-----------|
-| Desktop FPS | ≥60fps with Morde Foods scene loaded |
+| Desktop FPS | ≥60fps with Orion Demo Client scene loaded |
 | VR FPS | ≥72fps with simplified lighting |
 | Level load time | <30 seconds for 6500 tagged actors |
 | Search latency | <200ms for any query |

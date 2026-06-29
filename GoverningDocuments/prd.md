@@ -226,7 +226,7 @@ Plant operators need a **single application** that serves three distinct audienc
 
 | Criterion | Threshold |
 |-----------|-----------|
-| Desktop FPS | ≥60fps with Morde Foods scene loaded |
+| Desktop FPS | ≥60fps with Orion Demo Client scene loaded |
 | VR FPS | ≥72fps with simplified lighting |
 | Level load time | <30 seconds for 6500 tagged actors |
 | Search latency | <200ms for any query |
@@ -241,7 +241,7 @@ Plant operators need a **single application** that serves three distinct audienc
 
 ## Further Notes
 
-- **Reference client data:** Morde Foods P2 Manufacturing Plant — 6500 tags, 1394 instrumentation points, ~500 process lines, ~200 unique equipment
+- **Reference client data:** Orion Demo Client P2 Manufacturing Plant — 6500 tags, 1394 instrumentation points, ~500 process lines, ~200 unique equipment
 - **Team:** Sho (lead developer), Rohit (content author/co-developer)
 - **Open questions on Q1-Q5** (Plant 3D Python access, CAD drawing format, animation authoring, NPC character models, session recording scope) require client input before Phase 1 begins
 

@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/media/orion-studio-logo.jpg" alt="Orion Studios Logo" width="300"/>
+
 # 🏭 Orion Studios — OrionCollab
 
 ### Industrial Plant Visualization Platform
@@ -14,13 +16,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-00D4AA?style=for-the-badge)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20|%20PC%20VR-blue?style=for-the-badge)]()
 
-<br/>
-
-<img src="docs/media/orion-operations-mockup.png" alt="Orion Studios — Operations Mode" width="720"/>
-
-<br/>
-
-*Operations Mode — Real-time equipment inspection with P&ID data, maintenance checklists, and 2D minimap navigation*
 
 </div>
 
@@ -237,7 +232,7 @@ Each client deployment is configured via a single JSON file — no code changes 
 ```json
 {
   "client": {
-    "company_name": "Morde Foods",
+    "company_name": "Orion Demo Client",
     "plant_name": "P2 Manufacturing Plant",
     "accent_color": "#00D4AA"
   },
@@ -268,9 +263,19 @@ Each client deployment is configured via a single JSON file — no code changes 
 
 <div align="center">
 
-| Operations Mode Mockup | Viewport |
+### Operations Interface
+| Main Dashboard | Interface Detail |
 |:---:|:---:|
-| <img src="docs/media/orion-operations-mockup.png" width="400"/> | <img src="docs/media/orion-viewport.png" width="400"/> |
+| <img src="docs/media/ui_screenshot_3.png" width="400"/> | <img src="docs/media/ui_screenshot_1.png" width="400"/> |
+
+### Environment Visualization
+| Exterior Overview | Amenity Space |
+|:---:|:---:|
+| <img src="docs/media/exterior.png" width="400"/> | <img src="docs/media/amenity.png" width="400"/> |
+
+| Infrastructure Detail |
+|:---:|
+| <img src="docs/media/interior2.png" width="400"/> |
 
 </div>
 
@@ -311,7 +316,7 @@ python Scripts/tests/test_search_ui.py            # Search latency & results
 
 ## 📋 Reference Data
 
-Built and tested against the **Morde Foods P2 Manufacturing Plant**:
+Built and tested against the **Orion Demo Client P2 Manufacturing Plant**:
 - 6,500 equipment tags
 - 1,394 instrumentation points
 - ~500 process lines
@@ -324,7 +329,7 @@ Built and tested against the **Morde Foods P2 Manufacturing Plant**:
 | | Role |
 |---|---|
 | **Sho** | Lead Developer — Architecture, C++ subsystems, AI-assisted workflow |
-| **Rohit** | Content Author — Scene setup, material authoring, plant data |
+| **Rohit** | Contributor — Optimising and improving AI agents |
 
 ---
 

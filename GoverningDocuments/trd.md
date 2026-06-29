@@ -315,7 +315,7 @@ Delegates:
 
 **[SPEC]**
 
-#### DT_Equipment (Master Table — ~6500 rows for Morde Foods)
+#### DT_Equipment (Master Table — ~6500 rows for Orion Demo Client)
 
 | Column | UE Type | Constraints | Example |
 |--------|---------|-------------|---------|

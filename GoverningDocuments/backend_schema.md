@@ -744,7 +744,7 @@ Output file: `Saved/Logs/Telemetry/YYYY-MM-DD_session.json`
     "start_time": "2026-05-31T10:00:00Z",
     "end_time": "2026-05-31T11:30:00Z",
     "duration_seconds": 5400,
-    "client_name": "Morde Foods",
+    "client_name": "Orion Demo Client",
     "plant_name": "P2 Manufacturing Plant",
     "user_role": "Engineer",
     "platform": "Desktop"

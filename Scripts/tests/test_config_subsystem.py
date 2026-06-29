@@ -36,7 +36,7 @@ def run_tests():
     print(f"Loaded Target FPS (Desktop): {config.optimization.target_fps_desktop}")
     
     # Asserts
-    assert config.client.company_name == "Morde Foods", f"Assert failed: Company name should be 'Morde Foods', got '{config.client.company_name}'"
+    assert config.client.company_name == "Orion Demo Client", f"Assert failed: Company name should be 'Orion Demo Client', got '{config.client.company_name}'"
     assert config.client.plant_name == "P2 Manufacturing Plant", f"Assert failed: Plant name should be 'P2 Manufacturing Plant', got '{config.client.plant_name}'"
     assert config.optimization.target_fps_desktop == 60, f"Assert failed: Target FPS Desktop should be 60, got {config.optimization.target_fps_desktop}"
     assert cdo.is_config_valid == True, "Assert failed: is_config_valid should be True"

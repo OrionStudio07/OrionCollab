@@ -12,7 +12,7 @@ Each client deployment is configured via a single `OrionConfig.json` file locate
 {
   "$schema": "OrionConfig/v1",
   "client": {
-    "company_name": "Morde Foods",
+    "company_name": "Orion Demo Client",
     "plant_name": "P2 Manufacturing Plant",
     "logo_path": "Content/CollaborativeViewer/UMG/Textures/Logo.png",
     "accent_color": "#00D4AA"

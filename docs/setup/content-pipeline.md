@@ -28,6 +28,20 @@ flowchart LR
 
 ---
 
+## 📊 Source Data Format (Excel)
+
+The primary source of truth for all equipment metadata, process lines, and facility hierarchy is managed via Excel spreadsheets. If any formatting or data structure changes are required for the project, they can be updated directly in the source Excel file before being exported and imported into the engine.
+
+<div align="center">
+
+| Equipment Data Sheet | Process Lines & Hierarchy |
+|:---:|:---:|
+| <img src="../media/excel-data-format-1.png" width="400"/> | <img src="../media/excel-data-format-2.png" width="400"/> |
+
+</div>
+
+---
+
 ## Pipeline A: Geometry Import
 
 ### Step 1: Export from Plant 3D
