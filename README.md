@@ -6,7 +6,9 @@
 
 **Transform AutoCAD Plant 3D models into interactive, photorealistic experiences**
 
+[![Status](https://img.shields.io/badge/Status-Work%20In%20Progress-orange?style=for-the-badge)]()
 [![Unreal Engine](https://img.shields.io/badge/Unreal%20Engine-5.8-0E1128?style=for-the-badge&logo=unrealengine&logoColor=white)](https://www.unrealengine.com/)
+[![Built On](https://img.shields.io/badge/Built%20On-CollabViewer%20Template-purple?style=for-the-badge)]()
 [![C++](https://img.shields.io/badge/C++-17-00599C?style=for-the-badge&logo=cplusplus&logoColor=white)](https://isocpp.org/)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-00D4AA?style=for-the-badge)](LICENSE)
@@ -24,6 +26,10 @@
 
 ---
 
+> **🚧 Active Development** — This project is under active development. Core subsystems (C++ backend, data pipeline, UI framework) are implemented. Feature integration and content authoring are ongoing.
+
+---
+
 ## The Problem
 
 Industrial plants need to showcase facilities to investors, onboard employees, and support engineering inspections — without requiring physical access. Current solutions are:
@@ -34,7 +40,7 @@ Industrial plants need to showcase facilities to investors, onboard employees, a
 
 ## The Solution
 
-**Orion Studios** is a reusable Unreal Engine 5.8 platform that transforms AutoCAD Plant 3D exports into an interactive, photorealistic industrial visualization application — serving three distinct audiences from a single codebase.
+**Orion Studios** is built on top of Unreal Engine 5.8's **CollabViewer Template (CVT)** — extending its multi-user sessions, tool framework, and pawn system with a custom data pipeline, mode-based UI, and engineering-grade visualization tools. It transforms AutoCAD Plant 3D exports into an interactive, photorealistic industrial visualization application.
 
 ### Key Differentiators
 
@@ -80,36 +86,30 @@ Industrial plants need to showcase facilities to investors, onboard employees, a
 
 ## 🏗️ Architecture
 
-```mermaid
-graph TB
-    subgraph "Game Instance"
-        CL["BP_ConfigLoader<br/>JSON config parsing + hot-reload"]
-    end
+Built on the **CollabViewer Template (CVT)** — we extend its tool framework, pawn system, and multi-user sessions with custom Orion subsystems:
 
-    subgraph "World Subsystems (C++)"
-        MM["UOrionModeManager<br/>Mode state machine"]
-        HM["UOrionHierarchyManager<br/>Equipment tree + fuzzy search"]
-        ML["UOrionMetadataLinker<br/>Actor ↔ DataTable matching"]
-        CS["UOrionCameraSweepManager<br/>Smooth camera transitions"]
-    end
-
-    subgraph "Command Components (CVT Tools)"
-        XR["Enhanced Xray"] ~~~ EX["Enhanced Explode"]
-        CB["Enhanced CropBox"] ~~~ MS["Enhanced Measurement"]
-    end
-
-    subgraph "Data Layer"
-        DT["Data Tables<br/>6,500+ equipment entries"]
-        CF["OrionConfig.json<br/>Per-client configuration"]
-    end
-
-    CF --> CL
-    CL --> MM
-    DT --> HM
-    DT --> ML
-    MM -->|OnModeChanged| HM
-    HM -->|OnEquipmentSelected| CS
-    ML -->|Actor References| XR
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  Game Instance                                                     │
+│  └── BP_ConfigLoader (OrionConfig.json → validated config struct)  │
+├─────────────────────────────────────────────────────────────────────┤
+│  World Subsystems (C++)                 Data Layer                 │
+│  ├── UOrionModeManager                  ├── DT_Equipment (6,500+) │
+│  ├── UOrionHierarchyManager             ├── DT_Buildings           │
+│  ├── UOrionMetadataLinker               ├── DT_Rooms               │
+│  ├── UOrionCameraSweepManager           ├── DT_ProcessLines        │
+│  └── BP_TelemetryManager                └── DT_Zones               │
+├─────────────────────────────────────────────────────────────────────┤
+│  CVT Command Components (Extended)      Level Actors               │
+│  ├── Enhanced Xray                      ├── TourManager            │
+│  ├── Enhanced Explode                   ├── NPCManager             │
+│  ├── Enhanced CropBox                   ├── ZoneAnimationManager   │
+│  ├── Enhanced Measurement               └── InteractiveObjects     │
+│  └── Snapshot / RatioScale / DataSmith                             │
+├─────────────────────────────────────────────────────────────────────┤
+│  UI Layer (UMG)                                                    │
+│  └── WBP_OrionRoot → TopBar / SidePanel / BottomBar / Minimap     │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Module Classification
@@ -117,7 +117,7 @@ graph TB
 | Type | Lifecycle | Examples |
 |------|-----------|----------|
 | **World Subsystem** (C++) | Per-level, destroyed on unload | ModeManager, HierarchyManager, MetadataLinker, CameraSweep |
-| **Command Component** (BP) | CVT lifecycle: `Bind → Execute → Disabled` | Xray, Explode, CropBox, Measurement, Snapshot |
+| **Command Component** (BP) | Extends CVT's `BP_BaseCommandComponent` lifecycle | Xray, Explode, CropBox, Measurement, Snapshot |
 | **Level Actor** (BP) | Placed/spawned at runtime | TourManager, NPCManager, ZoneAnimationManager |
 | **Game Instance** (BP) | Persists across levels | ConfigLoader |
 
@@ -280,8 +280,7 @@ Each client deployment is configured via a single JSON file — no code changes 
 
 | Document | Description |
 |----------|-------------|
-| [System Architecture](docs/architecture/system-overview.md) | Module architecture, data flow, Mermaid diagrams |
-| [Flow Diagrams](docs/architecture/flow-diagrams.md) | Boot, mode transition, search, and matching sequences |
+| [System Architecture](docs/architecture/system-overview.md) | Module architecture and data flow |
 | [UI Design System](docs/design/ui-system.md) | Glassmorphism, mode-based visibility, transitions |
 | [Tree Browser](docs/design/tree-browser.md) | Virtualized list rendering for 6,500+ entries |
 | [Config Loader](docs/design/config-loader.md) | JSON loading, validation, hot-reload |

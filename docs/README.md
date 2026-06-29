@@ -10,7 +10,6 @@ Welcome to the OrionCollab documentation. This folder contains portfolio-friendl
 | Document | Description |
 |----------|-------------|
 | [System Overview](architecture/system-overview.md) | High-level module architecture, subsystem classification, and data flow |
-| [Flow Diagrams](architecture/flow-diagrams.md) | Canonical event sequences for all major features |
 
 ### Design Patterns
 | Document | Description |
